@@ -13,6 +13,7 @@
 		279021EF1EE6598800A4A7A1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 279021ED1EE6598800A4A7A1 /* Main.storyboard */; };
 		279021F11EE6598800A4A7A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 279021F01EE6598800A4A7A1 /* Assets.xcassets */; };
 		279021F41EE6598800A4A7A1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 279021F21EE6598800A4A7A1 /* LaunchScreen.storyboard */; };
+		279026191EE69F2400A4A7A1 /* AMapLocationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 279026181EE69F2400A4A7A1 /* AMapLocationKit.framework */; };
 		C553439E1A371699C7E21177 /* libPods-TLGaodeMap.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B7A7FA6B15435A81C927257 /* libPods-TLGaodeMap.a */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +29,7 @@
 		279021F01EE6598800A4A7A1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		279021F31EE6598800A4A7A1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		279021F51EE6598800A4A7A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		279026181EE69F2400A4A7A1 /* AMapLocationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AMapLocationKit.framework; path = Pods/AMapLocation/AMapLocationKit.framework; sourceTree = "<group>"; };
 		5490DDEBFD035748352A32DE /* Pods-TLGaodeMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TLGaodeMap.release.xcconfig"; path = "Pods/Target Support Files/Pods-TLGaodeMap/Pods-TLGaodeMap.release.xcconfig"; sourceTree = "<group>"; };
 		C8394631F332A9003C39C416 /* Pods-TLGaodeMap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TLGaodeMap.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TLGaodeMap/Pods-TLGaodeMap.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -37,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				279026191EE69F2400A4A7A1 /* AMapLocationKit.framework in Frameworks */,
 				C553439E1A371699C7E21177 /* libPods-TLGaodeMap.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -98,6 +101,7 @@
 		8A16388FEF9442B68EDD2B1D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				279026181EE69F2400A4A7A1 /* AMapLocationKit.framework */,
 				0B7A7FA6B15435A81C927257 /* libPods-TLGaodeMap.a */,
 			);
 			name = Frameworks;
@@ -139,6 +143,11 @@
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = 9RPTLW37DN;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+						};
 					};
 				};
 			};
@@ -352,6 +361,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 9RPTLW37DN;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/AMapLocation",
+				);
 				INFOPLIST_FILE = TLGaodeMap/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -366,6 +379,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 9RPTLW37DN;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/AMapLocation",
+				);
 				INFOPLIST_FILE = TLGaodeMap/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

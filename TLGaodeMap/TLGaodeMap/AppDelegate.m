@@ -7,6 +7,10 @@
 //
 
 #import "AppDelegate.h"
+#import <AMapFoundationKit/AMapFoundationKit.h>
+#import "ViewController.h"
+//需要引入头文件 ……
+#import <AMapLocationKit/AMapLocationKit.h>
 
 @interface AppDelegate ()
 
@@ -16,8 +20,14 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
-    // key: d1f057886e6cf36ebce5d444e9ac5307
+    // 开启 HTTPS 功能 您只需在配置高德 Key 前，添加开启 HTTPS 功能的代码，如下：
+    //[[AMapServices sharedServices] setEnableHTTPS:YES];
+    // 0.添加Key
+    [AMapServices sharedServices].apiKey=@"d1f057886e6cf36ebce5d444e9ac5307";
+    self.window=[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    UINavigationController* navigation=[[UINavigationController alloc]initWithRootViewController:[[ViewController alloc]init]];
+    self.window.rootViewController=navigation;
+    [self.window makeKeyAndVisible];
     return YES;
 }
 
