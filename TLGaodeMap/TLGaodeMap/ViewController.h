@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <MAMapKit/MAMapKit.h>
+#import <AMapFoundationKit/AMapFoundationKit.h>
 @interface ViewController : UIViewController<MAMapViewDelegate>
 
 @property(nonatomic,strong) MAMapView* mapView;

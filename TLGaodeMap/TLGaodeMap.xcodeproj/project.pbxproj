@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		276016A61EE8103C00B69CE2 /* TLTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 276016A51EE8103C00B69CE2 /* TLTextField.m */; };
 		279021E61EE6598800A4A7A1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 279021E51EE6598800A4A7A1 /* main.m */; };
 		279021E91EE6598800A4A7A1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 279021E81EE6598800A4A7A1 /* AppDelegate.m */; };
 		279021EC1EE6598800A4A7A1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 279021EB1EE6598800A4A7A1 /* ViewController.m */; };
@@ -19,6 +20,8 @@
 
 /* Begin PBXFileReference section */
 		0B7A7FA6B15435A81C927257 /* libPods-TLGaodeMap.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TLGaodeMap.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		276016A41EE8103C00B69CE2 /* TLTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLTextField.h; sourceTree = "<group>"; };
+		276016A51EE8103C00B69CE2 /* TLTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLTextField.m; sourceTree = "<group>"; };
 		279021E11EE6598800A4A7A1 /* TLGaodeMap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TLGaodeMap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		279021E51EE6598800A4A7A1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		279021E71EE6598800A4A7A1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -81,6 +84,8 @@
 				279021E81EE6598800A4A7A1 /* AppDelegate.m */,
 				279021EA1EE6598800A4A7A1 /* ViewController.h */,
 				279021EB1EE6598800A4A7A1 /* ViewController.m */,
+				276016A41EE8103C00B69CE2 /* TLTextField.h */,
+				276016A51EE8103C00B69CE2 /* TLTextField.m */,
 				279021ED1EE6598800A4A7A1 /* Main.storyboard */,
 				279021F01EE6598800A4A7A1 /* Assets.xcassets */,
 				279021F21EE6598800A4A7A1 /* LaunchScreen.storyboard */,
@@ -236,6 +241,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				279021EC1EE6598800A4A7A1 /* ViewController.m in Sources */,
+				276016A61EE8103C00B69CE2 /* TLTextField.m in Sources */,
 				279021E91EE6598800A4A7A1 /* AppDelegate.m in Sources */,
 				279021E61EE6598800A4A7A1 /* main.m in Sources */,
 			);
