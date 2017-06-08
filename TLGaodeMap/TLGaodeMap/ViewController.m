@@ -10,11 +10,22 @@
 #import <AMapLocationKit/AMapLocationKit.h>     // 导入头文件
 #import <Masonry.h>
 #import "TLTextField.h"
-@interface ViewController ()<AMapLocationManagerDelegate,UITableViewDelegate,UITableViewDataSource,UISearchControllerDelegate,UITextFieldDelegate>
+
+@interface ViewController ()<AMapLocationManagerDelegate,UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate>
 // 初始化AMapLocationManager对象,设置代理。
 @property(nonatomic,strong) AMapLocationManager* locationManager;
 // 可变的字典
-@property(nonatomic,strong) NSMutableDictionary* dic;
+@property(nonatomic,strong) NSMutableDictionary* dicData;
+// 可变的数组数据
+@property(nonatomic,strong) NSMutableArray* arrayData;
+// TableView Row 数组
+@property(nonatomic,strong) NSArray* rowCountArray;
+// 校区名字
+@property(nonatomic,strong) NSString* campusName;
+// 经度Str
+@property(nonatomic,strong) NSString* strLongitude;
+// pointList Array
+@property(nonatomic,strong) NSArray* arrayPointList;
 // gps按钮
 @property(nonatomic,strong) UIButton* gpsButton;
 // 校区表格视图
@@ -34,18 +45,37 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // 指定导航栏左边条按钮
-    self.leftItem=[[UIBarButtonItem alloc] initWithTitle:@"切换校区" style:UIBarButtonItemStylePlain target:self action:@selector(showView)];
-    self.navigationItem.leftBarButtonItem=_leftItem;
-    // 指定导航栏右边条按钮
-    self.rightItem=[[UIBarButtonItem alloc] initWithTitle:@"搜索" style:UIBarButtonItemStylePlain target:self action:@selector(search)];
-    self.navigationItem.rightBarButtonItem=_rightItem;
+    // 初始化导航栏UI
+    [self initNavigationUI];
+    /// 解析校园地图接口
+    // 0.指定URL请求
+    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://portal.zfsoft.com:9090/zftal-mobile/newmobile/MobileLoginServlet/getMapList"]];
+    // 1.使用NSURLSession会话获取网络返回的JSON并处理
+    NSURLSession* session = [NSURLSession sharedSession];
+    NSURLSessionDataTask* dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        self.arrayData = [NSMutableArray array];
+        self.arrayData = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
+        NSLog(@"arrayData = %@",_arrayData);
+        self.rowCountArray = [self.arrayData valueForKey:@"name"];
+        NSLog(@"行数数组 = %@",_rowCountArray);
+        
+        self.dicData = [self.arrayData valueForKey:@"pointList"];
+        NSLog(@"点列表 = %@",_dicData);
+        self.campusName = [self.dicData valueForKey:@"x"];
+        NSLog(@"x = %@",_campusName);
+        
+        self.strLongitude = [self.arrayData valueForKey:@"longitude"];
+        NSLog(@"经度 = %@",_strLongitude);
     
-    TLTextField* searchTet = [[TLTextField alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width * 0.7, 30)];
-    searchTet.delegate=self;
-    self.navigationItem.titleView=searchTet;
-    self.searchTxt = searchTet;
-    
+        self.arrayPointList = [self.arrayData valueForKey:@"pointList"];
+        NSLog(@"arrayPointList = %@",_arrayPointList);
+        
+        // 刷新TableView
+        [self.campusTableView reloadData];
+    }];
+    // 2.调用任务
+    [dataTask resume];
+    [self.campusTableView reloadData];
 //    [AMapServices sharedServices].enableHTTPS = YES;
     // 0.初始化地图视图
     self.mapView = [[MAMapView alloc]init];
@@ -57,15 +87,29 @@
     // 显示用户位置
     self.mapView.showsUserLocation=YES;
     // 设置地图的缩放级别 范围3-19
-    [self.mapView setZoomLevel:17.5 animated:YES];
+    [self.mapView setZoomLevel:17.5 animated:YES];//17.5
     // ✨设置此 用户跟踪模式 属性地图正常铺开显示
     self.mapView.userTrackingMode = MAUserTrackingModeFollow;// MAUserTrackingModeFollow 1
     // 设置指南针的位置
     self.mapView.compassOrigin = CGPointMake(self.mapView.compassOrigin.x-10, 70);
     
-    // 添加搜索
-    //self.campusSearch = [[UISearchController alloc] init];
-    //self.campusSearch.delegate=self;
+//    MACoordinateBounds coordinateBounds = MACoordinateBoundsMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814),CLLocationCoordinate2DMake(30.25595341, 120.11296749));
+//    MAGroundOverlay* groundOverlay = [MAGroundOverlay groundOverlayWithBounds:coordinateBounds icon:nil];
+//    [self.mapView addOverlay:groundOverlay];
+//    self.mapView.visibleMapRect = groundOverlay.boundingMapRect;
+    
+    //self.mapView = MACoordinateBoundsMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), CLLocationCoordinate2DMake(30.25595341, 120.11296749));
+    //self.mapView setRegion:MACoordinateRegion
+    
+//    MACoordinateBounds j = MACoordinateBoundsMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), CLLocationCoordinate2DMake(30.25595341, 120.13240814));
+//    CLLocationCoordinate2D cd[2];
+//    cd[0].latitude = 30.27044654;
+//    cd[0].longitude = 120.13240814;
+//    cd[1].latitude = 30.25595341;
+//    cd[1].longitude = 120.13240814;
+//    MAPolygon* polygon = [MAPolygon polygonWithPoints:cd count:2];
+//    [self.mapView addOverlay:polygon];
+    
     // 变焦显示器视图
     UIView* zoomPannelView = [self makeZoomPannelView];
     zoomPannelView.center = CGPointMake(self.view.bounds.size.width -  CGRectGetMidX(zoomPannelView.bounds) - 10, self.view.bounds.size.height -  CGRectGetMidY(zoomPannelView.bounds) - 10);
@@ -153,16 +197,27 @@
 //{
 //    
 //}
-
+#pragma mark - 初始化导航栏UI
+- (void)initNavigationUI
+{
+    // 指定导航栏左边条按钮
+    self.leftItem=[[UIBarButtonItem alloc] initWithTitle:@"切换校区" style:UIBarButtonItemStylePlain target:self action:@selector(showView)];
+    self.navigationItem.leftBarButtonItem=_leftItem;
+    // 指定导航栏右边条按钮
+    self.rightItem=[[UIBarButtonItem alloc] initWithTitle:@"搜索" style:UIBarButtonItemStylePlain target:self action:@selector(search)];
+    self.navigationItem.rightBarButtonItem=_rightItem;
+    // 添加搜索文本框
+    TLTextField* searchTet = [[TLTextField alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width * 0.7, 30)];
+    searchTet.delegate=self;
+    self.navigationItem.titleView=searchTet;
+    self.searchTxt = searchTet;
+}
 #pragma mark leftBarButton 点击事件方法
 - (void)showView
 {
     self.campusTableView = [[UITableView alloc] init];
     [self.view addSubview:_campusTableView];
-    self.campusTableView.frame = CGRectMake(5, 70, 200, 200);
-//    [self.campusTableView mas_makeConstraints:^(MASConstraintMaker *make) {
-//       
-//    }];
+    self.campusTableView.frame = CGRectMake(5, 70, 200, 180);
     self.campusTableView.delegate=self;
     self.campusTableView.dataSource=self;
     [self.searchTxt endEditing:YES];
@@ -176,12 +231,47 @@
 #pragma campusTableView DataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 4;
+    return self.rowCountArray.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell* cell = [[UITableViewCell alloc] init];
+    static NSString* campusCell = @"campusCell";
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:campusCell];
+    if (cell == nil)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:campusCell];
+    }
+    cell.textLabel.text = self.rowCountArray[indexPath.row];
     return cell;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0)
+    {
+        self.mapView.region = MACoordinateRegionMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), MACoordinateSpanMake(0.01449313, 0.01944065));
+        // 玉泉校区
+        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27044654, 120.13240814)];
+        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.25595341, 120.11296749)];
+    }
+    else if (indexPath.row == 1)
+    {
+        // 之江校区
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.19514054, 120.1307559)];
+        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.18855642, 120.12116432)];
+    }
+    else if (indexPath.row == 2)
+    {
+        //紫金港校区
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.31439469, 120.09236813)];
+        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.29497989, 120.08103848)];
+    }
+    else if (indexPath.row == 3)
+    {
+        // 华家池校区
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27878562, 120.20270348)];
+        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.26258864, 120.18922806)];
+    }
+    self.campusTableView.hidden = YES;
 }
 // 辞去第一响应者
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -190,11 +280,6 @@
     self.campusTableView.hidden=YES;
     [self.searchTxt endEditing:YES];
 }
-#pragma SearchControllerDelegate
-//- (void)didPresentSearchController:(UISearchController *)searchController
-//{
-//    searchController.searchBar.showsCancelButton = NO;
-//}
 #pragma mark - 变焦显示器视图
 - (UIView *)makeZoomPannelView
 {
