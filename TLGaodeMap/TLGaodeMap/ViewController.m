@@ -10,8 +10,9 @@
 #import <AMapLocationKit/AMapLocationKit.h>     // 导入头文件
 #import <Masonry.h>
 #import "TLTextField.h"
+#import <AMapSearchKit/AMapSearchKit.h>
 
-@interface ViewController ()<AMapLocationManagerDelegate,UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate>
+@interface ViewController ()<AMapLocationManagerDelegate,UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UIGestureRecognizerDelegate>
 // 初始化AMapLocationManager对象,设置代理。
 @property(nonatomic,strong) AMapLocationManager* locationManager;
 // 可变的字典
@@ -38,7 +39,15 @@
 //@property(nonatomic,strong) UISearchController* campusSearch;
 // 搜索文本框
 //@property(nonatomic,strong) UITextField* searchTxt;
+/// 用手势添加的标注点
+@property (nonatomic, strong) MAPointAnnotation *touchAnnotation;
 @property (nonatomic, weak) TLTextField *searchTxt;
+/// 搜索提示数组
+@property (nonatomic, strong) NSMutableArray *searchTipArr;
+/// 地图搜索对象
+@property (nonatomic, strong)  AMapSearchAPI *search;
+// 协调区域
+@property(nonatomic,assign) MACoordinateRegion boundary;
 @end
 
 @implementation ViewController
@@ -76,7 +85,7 @@
     // 2.调用任务
     [dataTask resume];
     [self.campusTableView reloadData];
-//    [AMapServices sharedServices].enableHTTPS = YES;
+    [AMapServices sharedServices].enableHTTPS = YES;
     // 0.初始化地图视图
     self.mapView = [[MAMapView alloc]init];
     self.mapView.frame=CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
@@ -87,7 +96,7 @@
     // 显示用户位置
     self.mapView.showsUserLocation=YES;
     // 设置地图的缩放级别 范围3-19
-    [self.mapView setZoomLevel:17.5 animated:YES];//17.5
+    [self.mapView setZoomLevel:15 animated:YES];//17.5
     // ✨设置此 用户跟踪模式 属性地图正常铺开显示
     self.mapView.userTrackingMode = MAUserTrackingModeFollow;// MAUserTrackingModeFollow 1
     // 设置指南针的位置
@@ -109,6 +118,15 @@
 //    cd[1].longitude = 120.13240814;
 //    MAPolygon* polygon = [MAPolygon polygonWithPoints:cd count:2];
 //    [self.mapView addOverlay:polygon];
+    
+//    NSURL *scheme = [NSURL URLWithString:@"iosamap://"];
+//    BOOL canOpen = [[UIApplication sharedApplication] canOpenURL:scheme];
+//    NSLog(@"可以打开 = %d",canOpen);
+//    NSURL *myLocationScheme = [NSURL URLWithString:@"iosamap://myLocation?sourceApplication=applicationName"]; if ([[UIDevice currentDevice].systemVersion integerValue] >= 10) {
+//        //iOS10以后,使用新API
+//        [[UIApplication sharedApplication] openURL:myLocationScheme options:@{} completionHandler:^(BOOL success) { NSLog(@"scheme调用结束"); }]; } else {
+//            //iOS10以前,使用旧API
+//            [[UIApplication sharedApplication] openURL:myLocationScheme]; }
     
     // 变焦显示器视图
     UIView* zoomPannelView = [self makeZoomPannelView];
@@ -177,8 +195,6 @@
 //        NSLog(@"dic = %@",_dic);
 //    }];
 //    [task resume];
-    
-    
 }
 // 接收位置更新,实现AMapLocationManagerDelegate代理的amaplocationManager:didUpdateLocation方法,处理位置更新
 //- (void)amapLocationManager:(AMapLocationManager *)manager didUpdateLocation:(CLLocation *)location reGeocode:(AMapLocationReGeocode *)reGeocode
@@ -197,6 +213,7 @@
 //{
 //    
 //}
+
 #pragma mark - 初始化导航栏UI
 - (void)initNavigationUI
 {
@@ -204,13 +221,29 @@
     self.leftItem=[[UIBarButtonItem alloc] initWithTitle:@"切换校区" style:UIBarButtonItemStylePlain target:self action:@selector(showView)];
     self.navigationItem.leftBarButtonItem=_leftItem;
     // 指定导航栏右边条按钮
-    self.rightItem=[[UIBarButtonItem alloc] initWithTitle:@"搜索" style:UIBarButtonItemStylePlain target:self action:@selector(search)];
+    self.rightItem=[[UIBarButtonItem alloc] initWithTitle:@"搜索" style:UIBarButtonItemStylePlain target:self action:@selector(searchButton)];
     self.navigationItem.rightBarButtonItem=_rightItem;
     // 添加搜索文本框
-    TLTextField* searchTet = [[TLTextField alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width * 0.7, 30)];
-    searchTet.delegate=self;
-    self.navigationItem.titleView=searchTet;
-    self.searchTxt = searchTet;
+    TLTextField* searchTxt = [[TLTextField alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width * 0.7, 30)];
+    searchTxt.delegate=self;
+    self.navigationItem.titleView=searchTxt;
+    self.searchTxt = searchTxt;
+    // 添加监听事件
+    //[searchTxt addTarget:self action:@selector(textFieldDidChange) forControlEvents:UIControlEventEditingChanged];
+}
+/**
+ *  监听输入框文字改变的回调方法
+ */
+- (void)textFieldDidChange {
+    // 每次搜索前先清空之前的搜索结果
+//    [self.searchTipArr removeAllObjects];
+//    //self.pullDownTableView.dataSourceArr = self.searchTipArr;
+//    // 构造AMapInputTipsSearchRequest对象参数
+//    AMapInputTipsSearchRequest *tipsRequest = [[AMapInputTipsSearchRequest alloc] init];
+//    tipsRequest.keywords = self.searchTxt.text;
+//    //tipsRequest.city = self.city;
+//    // 发起输入提示搜索
+//    [self.search AMapInputTipsSearch:tipsRequest];
 }
 #pragma mark leftBarButton 点击事件方法
 - (void)showView
@@ -223,7 +256,7 @@
     [self.searchTxt endEditing:YES];
 }
 #pragma mark RightBarButton 点击事件方法
-- (void)search
+- (void)searchButton;
 {
     [self.searchTxt endEditing:YES];
     self.campusTableView.hidden=YES;
@@ -248,10 +281,16 @@
 {
     if (indexPath.row == 0)
     {
-        self.mapView.region = MACoordinateRegionMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), MACoordinateSpanMake(0.01449313, 0.01944065));
+        //self.mapView.region = MACoordinateRegionMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), MACoordinateSpanMake(0.01449313, 0.01944065));
         // 玉泉校区
-        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27044654, 120.13240814)];
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27044654, 120.13240814)];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.25595341, 120.11296749)];
+        //MACoordinateBounds coordinateBounds = MACoordinateBoundsMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814),CLLocationCoordinate2DMake(30.25595341, 120.11296749));
+        //MAMapRect mapRect =
+        //self.mapView setBounds:<#(CGRect)#>
+        // 0.007246565, 0.009720325
+        //self.boundary = MACoordinateRegionMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), MACoordinateSpanMake(0.007246565, 0.009720325));
+        [self.mapView setLimitRegion:self.boundary];
     }
     else if (indexPath.row == 1)
     {
@@ -331,5 +370,6 @@
         [self.gpsButton setSelected:YES];
     }
 }
+
 
 @end

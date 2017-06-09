@@ -7,12 +7,15 @@ PODS:
   - AMapNavi (5.0.1):
     - AMap3DMap (~> 5.0)
     - AMapFoundation (~> 1.3)
+  - AMapSearch (5.1.0):
+    - AMapFoundation (~> 1.2)
   - Masonry (1.0.2)
 
 DEPENDENCIES:
   - AMap3DMap
   - AMapLocation
   - AMapNavi
+  - AMapSearch
   - Masonry
 
 SPEC CHECKSUMS:
@@ -20,8 +23,9 @@ SPEC CHECKSUMS:
   AMapFoundation: 636834a27cd003084f56b4232f3031e6a44c7e7e
   AMapLocation: dd203f76b034ef5cb546600f4e1ffad2a3a14072
   AMapNavi: d61087a4d00eca95fe75c329483bbb7529126525
+  AMapSearch: d4c924b929f433968669721a07b4bd57736f5f2a
   Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
 
-PODFILE CHECKSUM: de060eeecff9acd1287e9c1f23d9f571170c483b
+PODFILE CHECKSUM: 6795ef858e9354c858b3f962ba5262d751203a9f
 
 COCOAPODS: 1.1.1
