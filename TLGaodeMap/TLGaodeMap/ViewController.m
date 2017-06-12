@@ -48,6 +48,8 @@
 @property (nonatomic, strong)  AMapSearchAPI *search;
 // 协调区域
 @property(nonatomic,assign) MACoordinateRegion boundary;
+// BOOL 判断
+@property(nonatomic,assign) BOOL isOpen;
 @end
 
 @implementation ViewController
@@ -93,14 +95,30 @@
     [self.view addSubview:_mapView];
     // 指定代理
     self.mapView.delegate=self;
+    // 玉泉校区
+    //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27044654, 120.13240814)];
+    //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40, 116)];
     // 显示用户位置
     self.mapView.showsUserLocation=YES;
     // 设置地图的缩放级别 范围3-19
-    [self.mapView setZoomLevel:15 animated:YES];//17.5
+    [self.mapView setZoomLevel:14 animated:YES];//17.5
     // ✨设置此 用户跟踪模式 属性地图正常铺开显示
     self.mapView.userTrackingMode = MAUserTrackingModeFollow;// MAUserTrackingModeFollow 1
     // 设置指南针的位置
     self.mapView.compassOrigin = CGPointMake(self.mapView.compassOrigin.x-10, 70);
+    
+    // 变焦显示器视图
+    UIView* zoomPannelView = [self makeZoomPannelView];
+    zoomPannelView.center = CGPointMake(self.view.bounds.size.width -  CGRectGetMidX(zoomPannelView.bounds) - 10, self.view.bounds.size.height -  CGRectGetMidY(zoomPannelView.bounds) - 10);
+    zoomPannelView.autoresizingMask =  UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
+    [self.view addSubview:zoomPannelView];
+    
+    // gps按钮
+    self.gpsButton = [self makeGPSButtonView];
+    self.gpsButton.center = CGPointMake(CGRectGetMidX(self.gpsButton.bounds) + 10,
+                                        self.view.bounds.size.height -  CGRectGetMidY(self.gpsButton.bounds) - 20);
+    [self.view addSubview:self.gpsButton];
+    self.gpsButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin;
     
 //    MACoordinateBounds coordinateBounds = MACoordinateBoundsMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814),CLLocationCoordinate2DMake(30.25595341, 120.11296749));
 //    MAGroundOverlay* groundOverlay = [MAGroundOverlay groundOverlayWithBounds:coordinateBounds icon:nil];
@@ -127,19 +145,6 @@
 //        [[UIApplication sharedApplication] openURL:myLocationScheme options:@{} completionHandler:^(BOOL success) { NSLog(@"scheme调用结束"); }]; } else {
 //            //iOS10以前,使用旧API
 //            [[UIApplication sharedApplication] openURL:myLocationScheme]; }
-    
-    // 变焦显示器视图
-    UIView* zoomPannelView = [self makeZoomPannelView];
-    zoomPannelView.center = CGPointMake(self.view.bounds.size.width -  CGRectGetMidX(zoomPannelView.bounds) - 10, self.view.bounds.size.height -  CGRectGetMidY(zoomPannelView.bounds) - 10);
-    zoomPannelView.autoresizingMask =  UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
-    [self.view addSubview:zoomPannelView];
-    
-    // gps按钮
-    self.gpsButton = [self makeGPSButtonView];
-    self.gpsButton.center = CGPointMake(CGRectGetMidX(self.gpsButton.bounds) + 10,
-                                        self.view.bounds.size.height -  CGRectGetMidY(self.gpsButton.bounds) - 20);
-    [self.view addSubview:self.gpsButton];
-    self.gpsButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin;
     
 //    self.mapView 
     //self.mapView.mapType = MAMapTypeStandard;//映射类型标准
@@ -248,18 +253,27 @@
 #pragma mark leftBarButton 点击事件方法
 - (void)showView
 {
-    self.campusTableView = [[UITableView alloc] init];
-    [self.view addSubview:_campusTableView];
-    self.campusTableView.frame = CGRectMake(5, 70, 200, 180);
-    self.campusTableView.delegate=self;
-    self.campusTableView.dataSource=self;
-    [self.searchTxt endEditing:YES];
+    if (self.isOpen == NO)
+    {
+        self.campusTableView = [[UITableView alloc] init];
+        [self.view addSubview:_campusTableView];
+        self.campusTableView.frame = CGRectMake(5, 70, 200, 180);
+        self.campusTableView.delegate=self;
+        self.campusTableView.dataSource=self;
+        [self.searchTxt endEditing:YES];
+        self.isOpen = YES;
+    }
+    else
+    {
+        return;
+    }
 }
 #pragma mark RightBarButton 点击事件方法
 - (void)searchButton;
 {
     [self.searchTxt endEditing:YES];
     self.campusTableView.hidden=YES;
+    self.isOpen = NO;
 }
 #pragma campusTableView DataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -283,19 +297,42 @@
     {
         //self.mapView.region = MACoordinateRegionMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), MACoordinateSpanMake(0.01449313, 0.01944065));
         // 玉泉校区
-        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27044654, 120.13240814)];
+        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27044654, 120.13240814)];
+        
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.25595341, 120.11296749)];
         //MACoordinateBounds coordinateBounds = MACoordinateBoundsMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814),CLLocationCoordinate2DMake(30.25595341, 120.11296749));
         //MAMapRect mapRect =
         //self.mapView setBounds:<#(CGRect)#>
         // 0.007246565, 0.009720325
-        //self.boundary = MACoordinateRegionMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), MACoordinateSpanMake(0.007246565, 0.009720325));
-        [self.mapView setLimitRegion:self.boundary];
+//        self.boundary = MACoordinateRegionMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), MACoordinateSpanMake(0.007246565, 0.009720325));
+//        [self.mapView setLimitRegion:self.boundary];
+        self.boundary = MACoordinateRegionMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), MACoordinateSpanMake(0.05, 0.05));
+        MAMapRect mapRect = MAMapRectForCoordinateRegion(_boundary);
+//        [self.mapView setLimitRegion:self.boundary];
+
+        
+        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40, 116)];
+        //_boundary =  MACoordinateRegionMake(CLLocationCoordinate2DMake(40, 116), MACoordinateSpanMake(2, 2));
+        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27044654, 120.13240814) animated:YES];
+        //_boundary =  MACoordinateRegionMake(CLLocationCoordinate2DMake(30.25595341, 120.11296749), MACoordinateSpanMake(2, 2));
+        //[self.mapView setLimitRegion:self.boundary];
+        
+//        MAMapPoint point1 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(30.27044654, 120.13240814));
+//        MAMapPoint point2 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(30.25595341, 120.11296749));
+//        CLLocationDistance distance = MAMetersBetweenMapPoints(point1, point2);
+//        NSLog(@"distance = %f",distance);
+//        static inline MACoordinateBounds MACoordinateBoundsMake(CLLocationCoordinate2D northEast,CLLocationCoordinate2D southWest)
+//        {
+//            return (MACoordinateBounds){northEast, southWest};
+//        }
+        [self.mapView setLimitMapRect:mapRect];
+        
     }
     else if (indexPath.row == 1)
     {
+        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.25595341, 120.11296749) animated:YES];
         // 之江校区
-        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.19514054, 120.1307559)];
+        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.19514054, 120.1307559)];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.18855642, 120.12116432)];
     }
     else if (indexPath.row == 2)
@@ -311,6 +348,7 @@
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.26258864, 120.18922806)];
     }
     self.campusTableView.hidden = YES;
+    self.isOpen = NO;
 }
 // 辞去第一响应者
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -318,6 +356,7 @@
     // 隐藏tableView
     self.campusTableView.hidden=YES;
     [self.searchTxt endEditing:YES];
+    self.isOpen = NO;
 }
 #pragma mark - 变焦显示器视图
 - (UIView *)makeZoomPannelView

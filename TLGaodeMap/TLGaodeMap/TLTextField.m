@@ -9,7 +9,6 @@
 #import "TLTextField.h"
 
 @interface TLTextField ()<UITextFieldDelegate>
-@property(nonatomic,strong) UIImageView* leftImgView;
 @end
 
 @implementation TLTextField
@@ -40,11 +39,8 @@
     self.placeholder=@"请输入关键词";
     self.font=[UIFont systemFontOfSize:14];
     self.leftViewMode=UITextFieldViewModeAlways;
-    //UIImageView* leftView=[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"gpsStat1"]];
-    //leftView.frame=CGRectMake(0, 0, 15, 15);
-    //self.leftView=leftView;
     self.clearButtonMode=UITextFieldViewModeWhileEditing;
-    self.returnKeyType = UIReturnKeySearch;
+    //self.returnKeyType = UIReturnKeySearch;
 }
 // 设置leftView的位置
 - (CGRect)leftViewRectForBounds:(CGRect)bounds
