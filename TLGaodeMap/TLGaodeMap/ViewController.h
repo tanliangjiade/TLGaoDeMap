@@ -9,8 +9,13 @@
 #import <UIKit/UIKit.h>
 #import <MAMapKit/MAMapKit.h>
 #import <AMapFoundationKit/AMapFoundationKit.h>
-@interface ViewController : UIViewController<MAMapViewDelegate>
+#import <AMapSearchKit/AMapSearchKit.h>
+@interface ViewController : UIViewController<MAMapViewDelegate,AMapSearchDelegate>
 
-@property(nonatomic,strong) MAMapView* mapView;
+@property(nonatomic,strong) MAMapView* mapView;        // 地图视图
+
+@property(nonatomic,strong) NSMutableArray* searchList;// 搜索列表数组
+
+@property(nonatomic, strong) AMapSearchAPI * searchAPI;// 搜索API
 @end
 

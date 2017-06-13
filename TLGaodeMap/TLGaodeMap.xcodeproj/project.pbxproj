@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2700E2F21EEF7C680017DA4E /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2700E2F01EEF7C680017DA4E /* SearchViewController.m */; };
+		2700E2F31EEF7C680017DA4E /* SearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2700E2F11EEF7C680017DA4E /* SearchViewController.xib */; };
+		274CC7C61EEFD617009FD9F0 /* MAMapView+MapView.m in Sources */ = {isa = PBXBuildFile; fileRef = 274CC7C51EEFD617009FD9F0 /* MAMapView+MapView.m */; };
+		274CC7C91EF01143009FD9F0 /* AMapSearchObject+SearchObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 274CC7C81EF01143009FD9F0 /* AMapSearchObject+SearchObject.m */; };
 		276016A61EE8103C00B69CE2 /* TLTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 276016A51EE8103C00B69CE2 /* TLTextField.m */; };
 		279021E61EE6598800A4A7A1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 279021E51EE6598800A4A7A1 /* main.m */; };
 		279021E91EE6598800A4A7A1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 279021E81EE6598800A4A7A1 /* AppDelegate.m */; };
@@ -20,6 +24,13 @@
 
 /* Begin PBXFileReference section */
 		0B7A7FA6B15435A81C927257 /* libPods-TLGaodeMap.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TLGaodeMap.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2700E2EF1EEF7C680017DA4E /* SearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchViewController.h; sourceTree = "<group>"; };
+		2700E2F01EEF7C680017DA4E /* SearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchViewController.m; sourceTree = "<group>"; };
+		2700E2F11EEF7C680017DA4E /* SearchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SearchViewController.xib; sourceTree = "<group>"; };
+		274CC7C41EEFD617009FD9F0 /* MAMapView+MapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MAMapView+MapView.h"; sourceTree = "<group>"; };
+		274CC7C51EEFD617009FD9F0 /* MAMapView+MapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MAMapView+MapView.m"; sourceTree = "<group>"; };
+		274CC7C71EF01143009FD9F0 /* AMapSearchObject+SearchObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AMapSearchObject+SearchObject.h"; sourceTree = "<group>"; };
+		274CC7C81EF01143009FD9F0 /* AMapSearchObject+SearchObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AMapSearchObject+SearchObject.m"; sourceTree = "<group>"; };
 		276016A41EE8103C00B69CE2 /* TLTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLTextField.h; sourceTree = "<group>"; };
 		276016A51EE8103C00B69CE2 /* TLTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLTextField.m; sourceTree = "<group>"; };
 		279021E11EE6598800A4A7A1 /* TLGaodeMap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TLGaodeMap.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -84,6 +95,13 @@
 				279021E81EE6598800A4A7A1 /* AppDelegate.m */,
 				279021EA1EE6598800A4A7A1 /* ViewController.h */,
 				279021EB1EE6598800A4A7A1 /* ViewController.m */,
+				2700E2EF1EEF7C680017DA4E /* SearchViewController.h */,
+				2700E2F01EEF7C680017DA4E /* SearchViewController.m */,
+				274CC7C41EEFD617009FD9F0 /* MAMapView+MapView.h */,
+				274CC7C51EEFD617009FD9F0 /* MAMapView+MapView.m */,
+				274CC7C71EF01143009FD9F0 /* AMapSearchObject+SearchObject.h */,
+				274CC7C81EF01143009FD9F0 /* AMapSearchObject+SearchObject.m */,
+				2700E2F11EEF7C680017DA4E /* SearchViewController.xib */,
 				276016A41EE8103C00B69CE2 /* TLTextField.h */,
 				276016A51EE8103C00B69CE2 /* TLTextField.m */,
 				279021ED1EE6598800A4A7A1 /* Main.storyboard */,
@@ -181,6 +199,7 @@
 			files = (
 				279021F41EE6598800A4A7A1 /* LaunchScreen.storyboard in Resources */,
 				279021F11EE6598800A4A7A1 /* Assets.xcassets in Resources */,
+				2700E2F31EEF7C680017DA4E /* SearchViewController.xib in Resources */,
 				279021EF1EE6598800A4A7A1 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -240,8 +259,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				274CC7C91EF01143009FD9F0 /* AMapSearchObject+SearchObject.m in Sources */,
 				279021EC1EE6598800A4A7A1 /* ViewController.m in Sources */,
+				274CC7C61EEFD617009FD9F0 /* MAMapView+MapView.m in Sources */,
 				276016A61EE8103C00B69CE2 /* TLTextField.m in Sources */,
+				2700E2F21EEF7C680017DA4E /* SearchViewController.m in Sources */,
 				279021E91EE6598800A4A7A1 /* AppDelegate.m in Sources */,
 				279021E61EE6598800A4A7A1 /* main.m in Sources */,
 			);
