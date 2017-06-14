@@ -13,7 +13,9 @@
 #import "SearchViewController.h"
 #import "MAMapView+MapView.h"
 #import "AMapSearchObject+SearchObject.h"
-@interface ViewController ()<UITextFieldDelegate,UIGestureRecognizerDelegate,UITableViewDelegate,UITableViewDataSource>
+#import "PullDownTableView.h"
+#import "PlaceResultViewController.h"
+@interface ViewController ()<UITextFieldDelegate,UIGestureRecognizerDelegate,UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate,SelectedPlaceDelegate>//UISearchResultsUpdating
 // 初始化AMapLocationManager对象,设置代理。
 @property(nonatomic,strong) AMapLocationManager* locationManager;
 // 可变的字典
@@ -50,6 +52,10 @@
 @property(nonatomic,strong) SearchViewController* tableVC;
 // 搜索表格视图
 @property(nonatomic,strong) UITableView* searchTableView;
+/// 搜索结果数组
+@property (nonatomic, strong) NSMutableArray *searchResultArr;
+// 全局的位置坐标二维对象
+@property(nonatomic,assign) CLLocationCoordinate2D coordinate;
 @end
 
 @implementation ViewController
@@ -60,14 +66,16 @@
     [self initNavigationUI];
     // 设置地图视图
     [self setupMapView];
+    // 初始化搜索表格
+    //[self initSearchTableView];
+    // 初始化搜索栏
+    //[self initSearch];
     // 解析接口
     [self ParseInterface];
     // 搜索服务
     self.searchAPI = [[AMapSearchAPI alloc] init];
     self.searchAPI.delegate = self;
     //self.mapView.screenAnchor = CGPointMake(0.5, 0.5);
-    //[self initSearchTableView];
-    
 }
 #pragma mark - 初始化地图
 - (void)setupMapView
@@ -89,7 +97,10 @@
     // ✨设置此 用户跟踪模式 属性地图正常铺开显示
     self.mapView.userTrackingMode = MAUserTrackingModeFollow;// MAUserTrackingModeFollow 1
     // 设置中心坐标
-    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.26405277, 120.12346029) animated:YES];
+    _coordinate.latitude = 30.26405277;
+    _coordinate.longitude = 120.12346029;
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(_coordinate.latitude, _coordinate.longitude) animated:YES];
+    // 30.31011561  120.08065224;
     // 设置指南针的位置
     self.mapView.compassOrigin = CGPointMake(self.mapView.compassOrigin.x-10, 70);
     // 定义表示上下文1
@@ -128,6 +139,62 @@
     self.navigationItem.titleView=searchTxt;
     self.searchTxt = searchTxt;
 }
+#pragma mark - 初始化搜索
+- (void)initSearch
+{
+    self.search = [[UISearchController alloc]initWithSearchResultsController:_tableVC];
+    self.search.searchBar.frame = CGRectMake(self.search.searchBar.frame.origin.x, self.search.searchBar.frame.origin.y, self.search.searchBar.frame.size.width, 44.0);
+    self.search.dimsBackgroundDuringPresentation = NO;          //是否添加半透明覆盖层
+    self.search.hidesNavigationBarDuringPresentation = NO;       //是否隐藏导航栏
+    self.search.obscuresBackgroundDuringPresentation = NO;       //搜索时，背景变模糊
+    //self.search.searchResultsUpdater = self;
+    self.search.searchBar.delegate = self;
+    [self.search.searchBar setPlaceholder:@"请输入关键词"];
+    self.search.searchBar.showsCancelButton = YES;
+    
+    for (id obj in [self.search.searchBar subviews]) {
+        if ([obj isKindOfClass:[UIView class]]) {
+            for (id obj2 in [obj subviews]) {
+                if ([obj2 isKindOfClass:[UIButton class]]) {
+                    UIButton *btn = (UIButton *)obj2;
+                    [btn setTitle:@"取消" forState:UIControlStateNormal];
+                }
+            }
+        }
+    }
+    if (_search.searchBar)
+    {
+        self.navigationItem.titleView = _search.searchBar;
+    }
+    //    self.search.searchBar.returnKeyType = UIReturnKeyDefault;
+}
+//#pragma mark - UISearchResultsUpdating  搜索结果 delegate
+//- (void)updateSearchResultsForSearchController:(UISearchController *)searchController
+//{
+//    NSString *searchString = [searchController.searchBar text];
+//    
+//    //    [AMapSearchObject searchKeywords:searchString andCity:@"杭州" andSearchApi:_searchAPI]; //关键字搜索
+//    
+//    if(!searchString.length)
+//    {
+//        return;
+//    }
+//    _tableVC.tableView.hidden = YES;
+//    //搜索 关键字 和 搜索范围 搜索对象
+//    [AMapSearchObject searchPolygon:searchString andPiontsArray:[self returnZheDaPoint] andSearchApi:_searchAPI];
+//}
+#pragma mark UISearchBarDelegate 点击搜索 delegate
+//- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+//{
+//    NSString *keywords = searchBar.text;
+//    if(!keywords.length)
+//    {
+//        return;
+//    }                                                   //[self returnZheDaPoint]
+//    [AMapSearchObject searchPolygon:keywords andPiontsArray:[self returnZheDaPoint] andSearchApi:_searchAPI];
+//    //[AMapSearchObject searchKeywords:keywords andCity:@"杭州" andSearchApi:_searchAPI];
+//}
+
 #pragma mark -  解析校园地图接口
 - (void)ParseInterface
 {
@@ -156,7 +223,7 @@
     [dataTask resume];
     [self.campusTableView reloadData];
 }
-#pragma mark leftBarButton 点击事件方法
+#pragma mark - leftBarButton 点击事件方法
 - (void)showView
 {
     if (self.isOpen == NO)
@@ -174,23 +241,44 @@
         return;
     }
 }
-#pragma mark RightBarButton 点击事件方法
+#pragma mark - RightBarButton 点击事件方法
 - (void)searchButton;
 {
     [self.searchTxt endEditing:YES];
     self.campusTableView.hidden=YES;
     self.isOpen = NO;
-    self.searchTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, 200)];
-    [self.view addSubview:_searchTableView];
-    [self.searchTableView setBackgroundColor:[UIColor colorWithWhite:1 alpha:0.9]];
-    self.searchList = [NSMutableArray array];
-
-    NSString *keywords = _searchTxt.text;
-    if(!keywords.length)
-    {
-        return;
-    }
-    [AMapSearchObject searchPolygon:keywords andPiontsArray:[self returnZheDaPoint] andSearchApi:_searchAPI];
+    //构造AMapPlaceSearchRequest对象，配置POI查询参数 模糊搜索
+//    AMapPOIKeywordsSearchRequest* request = [[AMapPOIKeywordsSearchRequest alloc] init];
+//    request.requireExtension = NO;
+//    request.keywords = self.searchTxt.text;
+//    request.city = @"杭州";
+//    // 发起POI关键字搜索
+//    [self.searchAPI AMapPOIKeywordsSearch:request];
+    
+    // 周边检索
+    AMapPOIAroundSearchRequest* request = [[AMapPOIAroundSearchRequest alloc] init];
+    request.location = [AMapGeoPoint locationWithLatitude:_coordinate.latitude longitude:_coordinate.longitude];
+//    request.location = [AMapGeoPoint locationWithLatitude:30.30446546 longitude:120.08666039];
+    request.keywords = self.searchTxt.text;
+    /* 按照距离排序. */
+//    request.sortrule            = 0;
+//    // 是否返回扩展信息，默认为 NO。
+//    request.requireExtension    = YES;
+    // 发起周边检索
+    [self.searchAPI AMapPOIAroundSearch:request];
+    
+//    self.searchTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height) style:UITableViewStylePlain];
+//    [self.view addSubview:_searchTableView];
+//    [self.searchTableView setBackgroundColor:[UIColor colorWithWhite:1 alpha:0.9]];
+//    self.searchList = [NSMutableArray array];
+//
+//    NSString *keywords = _searchTxt.text;
+//    if(!keywords.length)
+//    {
+//        return;
+//    }
+//    [AMapSearchObject searchPolygon:keywords andPiontsArray:[self returnZheDaPoint] andSearchApi:_searchAPI];
+    
 //    //发起输入提示搜索
 //    AMapInputTipsSearchRequest *tipsRequest = [[AMapInputTipsSearchRequest alloc] init];
 //    //关键字
@@ -204,18 +292,35 @@
 /*  返回浙大的轮廓点  多边形 */
 - (NSArray *)returnZheDaPoint
 {
+//    AMapGeoPoint *Point1 = [[AMapGeoPoint alloc]init];
+//    Point1.latitude = 30.31011561;
+//    Point1.longitude = 120.08065224;
+//    AMapGeoPoint *Point2 = [[AMapGeoPoint alloc]init];
+//    Point2.latitude = 30.29509105;
+//    Point2.longitude = 120.08273363;
+//    AMapGeoPoint *Point3 = [[AMapGeoPoint alloc]init];
+//    Point3.latitude = 30.30937463;
+//    Point3.longitude = 120.08902073;
+//    AMapGeoPoint *Point4 = [[AMapGeoPoint alloc]init];
+//    Point4.latitude = 30.29477609;
+//    Point4.longitude = 120.09251833;
+    
+    //玉泉
     AMapGeoPoint *Point1 = [[AMapGeoPoint alloc]init];
-    Point1.latitude = 30.31011561;
-    Point1.longitude = 120.08065224;
+    Point1.latitude = 30.26405277;
+    Point1.longitude = 120.12346029;
+    //之江
     AMapGeoPoint *Point2 = [[AMapGeoPoint alloc]init];
-    Point2.latitude = 30.29509105;
-    Point2.longitude = 120.08273363;
+    Point2.latitude = 30.19258113;
+    Point2.longitude = 120.12537224;
+    //紫金港
     AMapGeoPoint *Point3 = [[AMapGeoPoint alloc]init];
-    Point3.latitude = 30.30937463;
-    Point3.longitude = 120.08902073;
+    Point3.latitude = 30.30446546;
+    Point3.longitude = 120.08666039;
+    //华家池
     AMapGeoPoint *Point4 = [[AMapGeoPoint alloc]init];
-    Point4.latitude = 30.29477609;
-    Point4.longitude = 120.09251833;
+    Point4.latitude = 30.26979791;
+    Point4.longitude = 120.19596577;
     
     NSArray *piontArr = [NSArray arrayWithObjects:Point1, Point2, Point3, Point4, nil];
     
@@ -263,13 +368,13 @@
     if (indexPath.row == 0)
     {
         // 玉泉校区
-        CLLocationCoordinate2D coordinate;
-        coordinate.latitude = 30.26405277;
-        coordinate.longitude = 120.12346029;
+        //CLLocationCoordinate2D coordinate;
+        _coordinate.latitude = 30.26405277;
+        _coordinate.longitude = 120.12346029;
         MACoordinateSpan span;
         span.latitudeDelta = 0.01393703;
         span.longitudeDelta = 0.01281023;
-        [_mapView showAppointRegionCoordinate:coordinate andSpan:span];
+        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27044654, 120.13240814)];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.25595341, 120.11296749) animated:YES];
 
@@ -277,13 +382,13 @@
     else if (indexPath.row == 1)
     {
         // 之江校区
-        CLLocationCoordinate2D coordinate;
-        coordinate.latitude = 30.19258113;
-        coordinate.longitude = 120.12537224;
+        //CLLocationCoordinate2D coordinate;
+        _coordinate.latitude = 30.19258113;
+        _coordinate.longitude = 120.12537224;
         MACoordinateSpan span;
         span.latitudeDelta = 0.00763204;
         span.longitudeDelta = 0.0102675;
-        [_mapView showAppointRegionCoordinate:coordinate andSpan:span];
+        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.19514054, 120.1307559)];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.18855642, 120.12116432)];
     }
@@ -292,26 +397,26 @@
         //紫金港校区
         //显示指定区域
         //需要一个中心点，和纵向跨度、横向跨度
-        CLLocationCoordinate2D coordinate;
-        coordinate.latitude = 30.30446546;
-        coordinate.longitude = 120.08666039;
+        //CLLocationCoordinate2D coordinate;
+        _coordinate.latitude = 30.30446546;
+        _coordinate.longitude = 120.08666039;
         MACoordinateSpan span;
         span.latitudeDelta = 0.02154799;
         span.longitudeDelta = 0.001202924;
-        [_mapView showAppointRegionCoordinate:coordinate andSpan:span];
+        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.31439469, 120.09236813)];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.29497989, 120.08103848)];
     }
     else if (indexPath.row == 3)
     {
         // 华家池校区
-        CLLocationCoordinate2D coordinate;
-        coordinate.latitude = 30.26979791;
-        coordinate.longitude = 120.19596577;
+        //CLLocationCoordinate2D coordinate;
+        _coordinate.latitude = 30.26979791;
+        _coordinate.longitude = 120.19596577;
         MACoordinateSpan span;
         span.latitudeDelta = 0.01367672;
         span.longitudeDelta = 0.00989199;
-        [_mapView showAppointRegionCoordinate:coordinate andSpan:span];
+        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27878562, 120.20270348)];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.26258864, 120.18922806)];
     }
@@ -389,20 +494,37 @@
     {
         return;
     }
-    _tableVC.tableView.hidden = NO;
-    // 通过 AMapPOISearchResponse 对象处理搜索结果
-    NSString* strCount = [NSString stringWithFormat:@"count: %zd",response.count];
-    NSString *strSuggestion = [NSString stringWithFormat:@"Suggestion: %@", response.suggestion];
+//    _tableVC.tableView.hidden = NO;
+//    // 通过 AMapPOISearchResponse 对象处理搜索结果
+//    NSString* strCount = [NSString stringWithFormat:@"count: %zd",response.count];
+//    NSString *strSuggestion = [NSString stringWithFormat:@"Suggestion: %@", response.suggestion];
+//    NSString *strPoi = @"";
+//    for (AMapPOI *p in response.pois)
+//    {
+//        strPoi = [NSString stringWithFormat:@"%@\nPOI: %@", strPoi, p.description];
+//    }
+//    NSString *result = [NSString stringWithFormat:@"%@ \n %@ \n %@", strCount, strSuggestion, strPoi];
+//    NSLog(@"Place: %@", result);
+//    self.tableVC.searchList = response.pois;
+//    [self.tableVC.tableView reloadData];
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithTitle:@"返回"
+                                             style:UIBarButtonItemStylePlain
+                                             target:self
+                                             action:nil];
     NSString *strPoi = @"";
-    for (AMapPOI *p in response.pois)
-    {
+    self.searchResultArr = [NSMutableArray array];
+    for (AMapPOI *p in response.pois) {
         strPoi = [NSString stringWithFormat:@"%@\nPOI: %@", strPoi, p.description];
+        [self.searchResultArr addObject:p];
     }
-    NSString *result = [NSString stringWithFormat:@"%@ \n %@ \n %@", strCount, strSuggestion, strPoi];
-    NSLog(@"Place: %@", result);
+    //[MBProgressHUD hideHUDForView:self.view];
+    // 跳转到搜索结果界面
+    PlaceResultViewController *VC = [[PlaceResultViewController alloc] init];
+    VC.delegate = self;
+    [self.navigationController pushViewController:VC animated:YES];
+    VC.dataSourceArr = self.searchResultArr;
 
-    self.tableVC.searchList = response.pois;
-    [self.tableVC.tableView reloadData];
 }
 #pragma mark - 单击地图时显示出点击位置名称
 - (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois

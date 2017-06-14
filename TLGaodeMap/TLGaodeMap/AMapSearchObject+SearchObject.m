@@ -18,6 +18,11 @@
     polygonS.points = array;
     polygon.polygon = polygonS;
     polygon.keywords = keywords;
+    
+    polygon.types = @"高等院校";
+    polygon.requireExtension = YES;
+    polygon.requireSubPOIs = YES;
+    
     [searchAPI AMapPOIPolygonSearch:polygon];
 }
 

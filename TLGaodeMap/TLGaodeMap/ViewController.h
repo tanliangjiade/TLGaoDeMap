@@ -17,5 +17,7 @@
 @property(nonatomic,strong) NSMutableArray* searchList;// 搜索列表数组
 
 @property(nonatomic, strong) AMapSearchAPI * searchAPI;// 搜索API
+
+@property(nonatomic, strong) UISearchController * search;//搜索框
 @end
 

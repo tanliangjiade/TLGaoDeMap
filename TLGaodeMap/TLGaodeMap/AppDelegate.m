@@ -24,6 +24,7 @@
     //[[AMapServices sharedServices] setEnableHTTPS:YES];
     // 0.添加Key
     [AMapServices sharedServices].apiKey=@"d1f057886e6cf36ebce5d444e9ac5307";
+    
     self.window=[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     UINavigationController* navigation=[[UINavigationController alloc]initWithRootViewController:[[ViewController alloc]init]];
     self.window.rootViewController=navigation;
