@@ -241,9 +241,15 @@
         return;
     }
 }
+-(void)changeButtonStatus{
+    self.rightItem.enabled = YES;
+}
 #pragma mark - RightBarButton 点击事件方法
 - (void)searchButton;
 {
+    self.rightItem.enabled = NO;
+    [self performSelector:@selector(changeButtonStatus) withObject:nil afterDelay:1.0f];//防止用户重复点击
+    
     [self.searchTxt endEditing:YES];
     self.campusTableView.hidden=YES;
     self.isOpen = NO;
@@ -526,16 +532,37 @@
     VC.dataSourceArr = self.searchResultArr;
 
 }
-#pragma mark - 单击地图时显示出点击位置名称
-- (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois
-{
-    if (pois)
+// 实现大头针标注回调方法
+- (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation {
+    if ([annotation isKindOfClass:[MAPointAnnotation class]])
     {
-        [self.mapView removeAnnotationsAndOverlays];
-        MATouchPoi* poi = [pois firstObject];
-        [self.mapView addPointAnnotation:poi];
+        static NSString *pointReuseIndentifier = @"pointReuseIndentifier";
+        MAAnnotationView *annotationView = (MAAnnotationView*)[mapView dequeueReusableAnnotationViewWithIdentifier:pointReuseIndentifier];
+        if (annotationView == nil)
+        {
+            annotationView = [[MAAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:pointReuseIndentifier];
+        }
+        
+//        annotationView.image = [UIImage imageNamed:@"yongCheShenQing_selectPlace"];
+        //设置中心点偏移，使得标注底部中间点成为经纬度对应点
+        annotationView.centerOffset = CGPointMake(0, -15);
+        annotationView.canShowCallout= YES;       //设置气泡可以弹出，默认为NO
+        annotationView.annotation = annotation;
+        return annotationView;
     }
+    return nil;
 }
+
+#pragma mark - 单击地图时显示出点击位置名称
+//- (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois
+//{
+//    if (pois)
+//    {
+//        [self.mapView removeAnnotationsAndOverlays];
+//        MATouchPoi* poi = [pois firstObject];
+//        [self.mapView addPointAnnotation:poi];
+//    }
+//}
 /*
  //    MACoordinateBounds coordinateBounds = MACoordinateBoundsMake(CLLocationCoordinate2DMake
  //                                                                 (39.939577, 116.388331),CLLocationCoordinate2DMake(39.935029, 116.384377));
