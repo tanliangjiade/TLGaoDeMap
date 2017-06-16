@@ -15,6 +15,7 @@
 #import "AMapSearchObject+SearchObject.h"
 #import "PullDownTableView.h"
 #import "PlaceResultViewController.h"
+
 @interface ViewController ()<UITextFieldDelegate,UIGestureRecognizerDelegate,UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate,SelectedPlaceDelegate>//UISearchResultsUpdating
 // 初始化AMapLocationManager对象,设置代理。
 @property(nonatomic,strong) AMapLocationManager* locationManager;
@@ -76,6 +77,7 @@
     self.searchAPI = [[AMapSearchAPI alloc] init];
     self.searchAPI.delegate = self;
     //self.mapView.screenAnchor = CGPointMake(0.5, 0.5);
+    
 }
 #pragma mark - 初始化地图
 - (void)setupMapView
@@ -107,13 +109,15 @@
     self.definesPresentationContext = YES;
     // 变焦显示器视图
     UIView* zoomPannelView = [self makeZoomPannelView];
-    zoomPannelView.center = CGPointMake(self.view.bounds.size.width -  CGRectGetMidX(zoomPannelView.bounds) - 10, self.view.bounds.size.height -  CGRectGetMidY(zoomPannelView.bounds) - 10);
+    //zoomPannelView.center = CGPointMake(self.view.bounds.size.width -  CGRectGetMidX(zoomPannelView.bounds) - 10, self.view.bounds.size.height -  CGRectGetMidY(zoomPannelView.bounds) - 10);
+    zoomPannelView.center = CGPointMake(self.view.bounds.size.width -  CGRectGetMidX(zoomPannelView.bounds) - 10, self.view.bounds.size.height -  CGRectGetMidY(zoomPannelView.bounds) - 80);
     zoomPannelView.autoresizingMask =  UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     [self.view addSubview:zoomPannelView];
     // gps按钮
     self.gpsButton = [self makeGPSButtonView];
-    self.gpsButton.center = CGPointMake(CGRectGetMidX(self.gpsButton.bounds) + 10,
-                                        self.view.bounds.size.height -  CGRectGetMidY(self.gpsButton.bounds) - 20);
+    //self.gpsButton.center = CGPointMake(CGRectGetMidX(self.gpsButton.bounds) + 10,
+                                        //self.view.bounds.size.height -  CGRectGetMidY(self.gpsButton.bounds) - 20);
+    self.gpsButton.center = CGPointMake(self.view.frame.origin.x+30, 160);
     [self.view addSubview:self.gpsButton];
     self.gpsButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin;
     
@@ -532,27 +536,143 @@
     VC.dataSourceArr = self.searchResultArr;
 
 }
-// 实现大头针标注回调方法
-- (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation {
+#pragma mark - viewDidAppear
+//- (void)viewDidAppear:(BOOL)animated
+//{
+//    [super viewDidAppear:animated];
+//    // 点注释类
+//    MAPointAnnotation* pointAnnotation = [[MAPointAnnotation alloc] init];
+//    pointAnnotation.coordinate = CLLocationCoordinate2DMake(self.coordinate.latitude, self.coordinate.longitude);
+//    pointAnnotation.title = @"方恒国际";
+//    pointAnnotation.subtitle = @"阜通东大街6号";
+//    [self.mapView addAnnotation:pointAnnotation];
+//}
+/**
+ *  添加大头针
+ */
+- (void)addAnnotationWith:(id)place {
+    // 每添加一个大头针之前先清空之前已经添加的大头针
+    //[self removePreviousAnnotation];
+    
+    MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
+    if ([place isKindOfClass:[AMapPOI class]]) {
+        AMapPOI *pPoi = (AMapPOI *)place;
+        pointAnnotation.coordinate = CLLocationCoordinate2DMake(pPoi.location.latitude, pPoi.location.longitude);
+        pointAnnotation.title = pPoi.name;
+        pointAnnotation.subtitle = pPoi.address;
+    }else if ([place isKindOfClass:[AMapTip class]]) {
+        AMapTip *pTip = (AMapTip *)place;
+        pointAnnotation.coordinate = CLLocationCoordinate2DMake(pTip.location.latitude, pTip.location.longitude);
+        pointAnnotation.title = pTip.name;
+        pointAnnotation.subtitle = pTip.address;
+    }
+    // 1.刷新地图
+    self.mapView.centerCoordinate = pointAnnotation.coordinate;
+    // 2.添加大头针
+    [self.mapView addAnnotation:pointAnnotation];
+    // 3.选中 ===>默认弹出气泡
+    [self.mapView selectAnnotation:pointAnnotation animated:YES];
+    // 弹出确定按钮
+    //[self popConfirmButton];
+}
+/**
+ *  移除上一个已经添加大头针
+ */
+- (void)removePreviousAnnotation {
+    // 移除之前已经添加的大头针
+    NSArray *annotationArray = self.mapView.annotations;
+    for (int i = 0; i < annotationArray.count; ++i) {
+        // 将不是用户位置信息的标注点移除掉
+        if (![annotationArray[i] isKindOfClass:[MAUserLocation class]]) {
+            [self.mapView removeAnnotation:annotationArray[i]];
+        }
+    }
+}
+#pragma mark - 实现 <MAMapViewDelegate> 协议中的 mapView:viewForAnnotation:回调函数，设置标注样式。
+- (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation
+{
     if ([annotation isKindOfClass:[MAPointAnnotation class]])
     {
-        static NSString *pointReuseIndentifier = @"pointReuseIndentifier";
-        MAAnnotationView *annotationView = (MAAnnotationView*)[mapView dequeueReusableAnnotationViewWithIdentifier:pointReuseIndentifier];
+        static NSString* pointReuseIndentifier = @"pointReuseIndentifier";
+        MAPinAnnotationView* annotationView = (MAPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:pointReuseIndentifier];
         if (annotationView == nil)
         {
-            annotationView = [[MAAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:pointReuseIndentifier];
+            annotationView = [[MAPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:pointReuseIndentifier];
         }
-        
-//        annotationView.image = [UIImage imageNamed:@"yongCheShenQing_selectPlace"];
-        //设置中心点偏移，使得标注底部中间点成为经纬度对应点
-        annotationView.centerOffset = CGPointMake(0, -15);
         annotationView.canShowCallout= YES;       //设置气泡可以弹出，默认为NO
-        annotationView.annotation = annotation;
+        annotationView.animatesDrop = YES;        //设置标注动画显示，默认为NO
+        annotationView.draggable = YES;        //设置标注可以拖动，默认为NO
+        annotationView.pinColor = MAPinAnnotationColorPurple;
         return annotationView;
     }
     return nil;
 }
+// 实现大头针标注回调方法
+//- (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation {
+//    if ([annotation isKindOfClass:[MAPointAnnotation class]])
+//    {
+//        static NSString *pointReuseIndentifier = @"pointReuseIndentifier";
+//        MAAnnotationView *annotationView = (MAAnnotationView*)[mapView dequeueReusableAnnotationViewWithIdentifier:pointReuseIndentifier];
+//        if (annotationView == nil)
+//        {
+//            annotationView = [[MAAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:pointReuseIndentifier];
+//        }
+//        
+//        //annotationView.image = [UIImage imageNamed:@"map-mark"];
+//        //设置中心点偏移，使得标注底部中间点成为经纬度对应点
+////        annotationView.centerOffset = CGPointMake(0, -15);
+////        annotationView.canShowCallout= YES;       //设置气泡可以弹出，默认为NO
+////        annotationView.annotation = annotation;
+//        
+//        annotationView.canShowCallout= YES;       //设置气泡可以弹出，默认为NO
+//        //annotationView.animatesDrop = YES;        //设置标注动画显示，默认为NO
+//        annotationView.draggable = YES;        //设置标注可以拖动，默认为NO
+//        //annotationView.pinColor = MAPinAnnotationColorPurple;
+//        return annotationView;
+//    }
+//    return nil;
+//}
+#pragma mark - SelectedPlaceDelegate
+// 实现选中地点的回调方法
+- (void)cellDidClickCallbackWith:(AMapPOI *)place
+{
+    // 添加大头针
+    [self addAnnotationWith:place];
 
+    CGFloat wth = self.view.frame.size.width / 2;
+    UIButton* detailsBtn = [[UIButton alloc] init];
+    [detailsBtn setTitle:@"详情" forState:UIControlStateNormal];
+    detailsBtn.backgroundColor = [UIColor whiteColor];
+    [detailsBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+    [self.mapView addSubview:detailsBtn];
+    [detailsBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(self.mapView.mas_bottom).offset(0);
+        make.left.equalTo(self.mapView.mas_left).offset(0);
+        make.width.offset(wth);
+        make.height.offset(60);
+    }];
+    
+    UIButton* goHere = [[UIButton alloc] init];
+    [goHere setTitle:@"去这里" forState:UIControlStateNormal];
+    goHere.backgroundColor = [UIColor whiteColor];
+    [goHere setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+    [self.mapView addSubview:goHere];
+    [goHere mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(self.mapView.mas_bottom).offset(0);
+        make.right.equalTo(self.mapView.mas_right).offset(0);
+        make.width.offset(wth);
+        make.height.offset(60);
+    }];
+
+    
+    [detailsBtn addTarget:self action:@selector(goDetails) forControlEvents:UIControlEventTouchUpInside];
+    
+}
+- (void)goDetails
+{
+    PlaceResultViewController* tl = [[PlaceResultViewController alloc] init];
+    [self.navigationController pushViewController:tl animated:YES];
+}
 #pragma mark - 单击地图时显示出点击位置名称
 //- (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois
 //{
@@ -668,4 +788,40 @@
  //}
 
  */
+
+//单击地图时显示出点击位置名称
+- (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois
+{
+    // 添加大头针
+    //[self addAnnotationWith:nil];
+//    NSString* dd = [[NSString alloc] init];
+//    [self cellDidClickCallbackWith:(AMapPOI *)dd];
+    
+//    AMapPOI *poi = (AMapPOI *)pois;
+//    AMapPOI* poi = [[AMapPOI alloc] init];
+////    [self addAnnotationWith:poi];
+//    [self addAnnotationWith:(AMapPOI *)poi];
+    MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
+    AMapPOI* place = [[AMapPOI alloc] init];
+    if ([place isKindOfClass:[AMapPOI class]]) {
+        AMapPOI *pPoi = (AMapPOI *)place;
+        pointAnnotation.coordinate = CLLocationCoordinate2DMake(self.coordinate.latitude, self.coordinate.longitude);//pPoi.location.longitude
+//        pointAnnotation.title = pPoi.name;
+//        pointAnnotation.title = (NSString *)[pois[0] objectForKey:@"_name"];
+        pointAnnotation.title = [pois[0] valueForKey:@"name"];
+//        pointAnnotation.subtitle = pPoi.address;
+        pointAnnotation.subtitle = [pois[0] valueForKey:@"uid"];
+    }else if ([place isKindOfClass:[AMapTip class]]) {
+        AMapTip *pTip = (AMapTip *)place;
+        pointAnnotation.coordinate = CLLocationCoordinate2DMake(pTip.location.latitude, pTip.location.longitude);
+        pointAnnotation.title = pTip.name;
+        pointAnnotation.subtitle = pTip.address;
+    }
+    // 1.刷新地图
+    self.mapView.centerCoordinate = pointAnnotation.coordinate;
+    // 2.添加大头针
+    [self.mapView addAnnotation:pointAnnotation];
+    // 3.选中 ===>默认弹出气泡
+    [self.mapView selectAnnotation:pointAnnotation animated:YES];
+}
 @end

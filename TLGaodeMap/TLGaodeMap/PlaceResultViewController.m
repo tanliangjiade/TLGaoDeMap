@@ -17,18 +17,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setUp];
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
 #pragma mark - Private Method
 
 - (void)setUp {
     self.navigationItem.title = @"搜索结果";
-    //self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back"] style:UIBarButtonItemStylePlain target:self action:@selector(back)];
     [self.tableView registerClass:[ResultPlaceCell class] forCellReuseIdentifier:@"MyResultPlaceCell"];
     //    [self.tableView registerNib:[UINib nibWithNibName:@"ResultPlaceCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"MyResultPlaceCell"];
     self.tableView.rowHeight = 60;
