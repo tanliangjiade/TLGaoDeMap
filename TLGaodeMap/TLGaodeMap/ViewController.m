@@ -552,7 +552,7 @@
  */
 - (void)addAnnotationWith:(id)place {
     // 每添加一个大头针之前先清空之前已经添加的大头针
-    //[self removePreviousAnnotation];
+    [self removePreviousAnnotation];
     
     MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
     if ([place isKindOfClass:[AMapPOI class]]) {
@@ -651,7 +651,6 @@
         make.width.offset(wth);
         make.height.offset(60);
     }];
-    
     UIButton* goHere = [[UIButton alloc] init];
     [goHere setTitle:@"去这里" forState:UIControlStateNormal];
     goHere.backgroundColor = [UIColor whiteColor];
@@ -664,15 +663,27 @@
         make.height.offset(60);
     }];
 
-    
     [detailsBtn addTarget:self action:@selector(goDetails) forControlEvents:UIControlEventTouchUpInside];
-    
 }
+#pragma mark - 跳转搜索结果界面
 - (void)goDetails
 {
     PlaceResultViewController* tl = [[PlaceResultViewController alloc] init];
     [self.navigationController pushViewController:tl animated:YES];
 }
+/**
+ *  移除上一个已经添加大头针
+ */
+//- (void)removePreviousAnnotation {
+//    // 移除之前已经添加的大头针
+//    NSArray *annotationArray = self.mapView.annotations;
+//    for (int i = 0; i < annotationArray.count; ++i) {
+//        // 将不是用户位置信息的标注点移除掉
+//        if (![annotationArray[i] isKindOfClass:[MAUserLocation class]]) {
+//            [self.mapView removeAnnotation:annotationArray[i]];
+//        }
+//    }
+//}
 #pragma mark - 单击地图时显示出点击位置名称
 //- (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois
 //{
@@ -796,11 +807,11 @@
     //[self addAnnotationWith:nil];
 //    NSString* dd = [[NSString alloc] init];
 //    [self cellDidClickCallbackWith:(AMapPOI *)dd];
-    
 //    AMapPOI *poi = (AMapPOI *)pois;
 //    AMapPOI* poi = [[AMapPOI alloc] init];
 ////    [self addAnnotationWith:poi];
 //    [self addAnnotationWith:(AMapPOI *)poi];
+
     MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
     AMapPOI* place = [[AMapPOI alloc] init];
     if ([place isKindOfClass:[AMapPOI class]]) {
@@ -824,4 +835,6 @@
     // 3.选中 ===>默认弹出气泡
     [self.mapView selectAnnotation:pointAnnotation animated:YES];
 }
+
+
 @end

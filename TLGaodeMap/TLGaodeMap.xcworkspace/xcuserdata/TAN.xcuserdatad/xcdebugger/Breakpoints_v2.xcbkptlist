@@ -52,11 +52,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "TLGaodeMap/ViewController.m"
-            timestampString = "519297911.194932"
+            timestampString = "519462470.641064"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "811"
-            endingLineNumber = "811"
+            startingLineNumber = "822"
+            endingLineNumber = "822"
             landmarkName = "-mapView:didTouchPois:"
             landmarkType = "7">
          </BreakpointContent>
@@ -74,6 +74,22 @@
             startingLineNumber = "637"
             endingLineNumber = "637"
             landmarkName = "-cellDidClickCallbackWith:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TLGaodeMap/ViewController.m"
+            timestampString = "519462839.206072"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "819"
+            endingLineNumber = "819"
+            landmarkName = "-mapView:didTouchPois:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

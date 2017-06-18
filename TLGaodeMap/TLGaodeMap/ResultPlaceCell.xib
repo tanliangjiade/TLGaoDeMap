@@ -62,7 +62,7 @@
                 <constraint firstAttribute="bottom" secondItem="oPT-Ri-eXG" secondAttribute="bottom" id="fNg-tW-de1"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-            <point key="canvasLocation" x="447" y="173"/>
+            <point key="canvasLocation" x="-152" y="47"/>
         </view>
     </objects>
     <resources>
