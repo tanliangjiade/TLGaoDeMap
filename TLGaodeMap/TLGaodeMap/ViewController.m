@@ -15,6 +15,8 @@
 #import "AMapSearchObject+SearchObject.h"
 #import "PullDownTableView.h"
 #import "PlaceResultViewController.h"
+#import "PathPlanningViewController.h"
+#import "DetailsViewController.h"
 
 @interface ViewController ()<UITextFieldDelegate,UIGestureRecognizerDelegate,UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate,SelectedPlaceDelegate>//UISearchResultsUpdating
 // 初始化AMapLocationManager对象,设置代理。
@@ -57,6 +59,14 @@
 @property (nonatomic, strong) NSMutableArray *searchResultArr;
 // 全局的位置坐标二维对象
 @property(nonatomic,assign) CLLocationCoordinate2D coordinate;
+@property(nonnull,strong)AMapPOI *pPoi;
+@property (nonatomic, strong) MAPointAnnotation *startAnnotation;
+@property (nonatomic, strong) MAPointAnnotation *destinationAnnotation;
+// 路线规划类
+@property (nonatomic, strong) AMapRoute *route;
+/* 当前路线方案索引值. */
+@property (nonatomic) NSInteger currentCourse;
+@property (nonatomic,strong) DetailsViewController* details;
 @end
 
 @implementation ViewController
@@ -72,12 +82,11 @@
     // 初始化搜索栏
     //[self initSearch];
     // 解析接口
-    [self ParseInterface];
-    // 搜索服务
+//    [self ParseInterface];
+    // 搜索服务对象
     self.searchAPI = [[AMapSearchAPI alloc] init];
+    // 遵守代理
     self.searchAPI.delegate = self;
-    //self.mapView.screenAnchor = CGPointMake(0.5, 0.5);
-    
 }
 #pragma mark - 初始化地图
 - (void)setupMapView
@@ -122,12 +131,6 @@
     self.gpsButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin;
     
 }
-#pragma mark - 初始化搜索表格视图
-- (void)initSearchTableView
-{
-    self.tableVC = [[SearchViewController alloc]initWithStyle:UITableViewStylePlain];
-    self.tableVC.mapView = _mapView;
-}
 #pragma mark - 初始化导航栏UI
 - (void)initNavigationUI
 {
@@ -143,62 +146,6 @@
     self.navigationItem.titleView=searchTxt;
     self.searchTxt = searchTxt;
 }
-#pragma mark - 初始化搜索
-- (void)initSearch
-{
-    self.search = [[UISearchController alloc]initWithSearchResultsController:_tableVC];
-    self.search.searchBar.frame = CGRectMake(self.search.searchBar.frame.origin.x, self.search.searchBar.frame.origin.y, self.search.searchBar.frame.size.width, 44.0);
-    self.search.dimsBackgroundDuringPresentation = NO;          //是否添加半透明覆盖层
-    self.search.hidesNavigationBarDuringPresentation = NO;       //是否隐藏导航栏
-    self.search.obscuresBackgroundDuringPresentation = NO;       //搜索时，背景变模糊
-    //self.search.searchResultsUpdater = self;
-    self.search.searchBar.delegate = self;
-    [self.search.searchBar setPlaceholder:@"请输入关键词"];
-    self.search.searchBar.showsCancelButton = YES;
-    
-    for (id obj in [self.search.searchBar subviews]) {
-        if ([obj isKindOfClass:[UIView class]]) {
-            for (id obj2 in [obj subviews]) {
-                if ([obj2 isKindOfClass:[UIButton class]]) {
-                    UIButton *btn = (UIButton *)obj2;
-                    [btn setTitle:@"取消" forState:UIControlStateNormal];
-                }
-            }
-        }
-    }
-    if (_search.searchBar)
-    {
-        self.navigationItem.titleView = _search.searchBar;
-    }
-    //    self.search.searchBar.returnKeyType = UIReturnKeyDefault;
-}
-//#pragma mark - UISearchResultsUpdating  搜索结果 delegate
-//- (void)updateSearchResultsForSearchController:(UISearchController *)searchController
-//{
-//    NSString *searchString = [searchController.searchBar text];
-//    
-//    //    [AMapSearchObject searchKeywords:searchString andCity:@"杭州" andSearchApi:_searchAPI]; //关键字搜索
-//    
-//    if(!searchString.length)
-//    {
-//        return;
-//    }
-//    _tableVC.tableView.hidden = YES;
-//    //搜索 关键字 和 搜索范围 搜索对象
-//    [AMapSearchObject searchPolygon:searchString andPiontsArray:[self returnZheDaPoint] andSearchApi:_searchAPI];
-//}
-#pragma mark UISearchBarDelegate 点击搜索 delegate
-//- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
-//{
-//    NSString *keywords = searchBar.text;
-//    if(!keywords.length)
-//    {
-//        return;
-//    }                                                   //[self returnZheDaPoint]
-//    [AMapSearchObject searchPolygon:keywords andPiontsArray:[self returnZheDaPoint] andSearchApi:_searchAPI];
-//    //[AMapSearchObject searchKeywords:keywords andCity:@"杭州" andSearchApi:_searchAPI];
-//}
-
 #pragma mark -  解析校园地图接口
 - (void)ParseInterface
 {
@@ -257,86 +204,17 @@
     [self.searchTxt endEditing:YES];
     self.campusTableView.hidden=YES;
     self.isOpen = NO;
-    //构造AMapPlaceSearchRequest对象，配置POI查询参数 模糊搜索
-//    AMapPOIKeywordsSearchRequest* request = [[AMapPOIKeywordsSearchRequest alloc] init];
-//    request.requireExtension = NO;
-//    request.keywords = self.searchTxt.text;
-//    request.city = @"杭州";
-//    // 发起POI关键字搜索
-//    [self.searchAPI AMapPOIKeywordsSearch:request];
-    
     // 周边检索
     AMapPOIAroundSearchRequest* request = [[AMapPOIAroundSearchRequest alloc] init];
     request.location = [AMapGeoPoint locationWithLatitude:_coordinate.latitude longitude:_coordinate.longitude];
-//    request.location = [AMapGeoPoint locationWithLatitude:30.30446546 longitude:120.08666039];
     request.keywords = self.searchTxt.text;
     /* 按照距离排序. */
-//    request.sortrule            = 0;
-//    // 是否返回扩展信息，默认为 NO。
-//    request.requireExtension    = YES;
+    //request.sortrule            = 0;
+    // 是否返回扩展信息，默认为 NO。
+    //request.requireExtension    = YES;
     // 发起周边检索
     [self.searchAPI AMapPOIAroundSearch:request];
-    
-//    self.searchTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height) style:UITableViewStylePlain];
-//    [self.view addSubview:_searchTableView];
-//    [self.searchTableView setBackgroundColor:[UIColor colorWithWhite:1 alpha:0.9]];
-//    self.searchList = [NSMutableArray array];
-//
-//    NSString *keywords = _searchTxt.text;
-//    if(!keywords.length)
-//    {
-//        return;
-//    }
-//    [AMapSearchObject searchPolygon:keywords andPiontsArray:[self returnZheDaPoint] andSearchApi:_searchAPI];
-    
-//    //发起输入提示搜索
-//    AMapInputTipsSearchRequest *tipsRequest = [[AMapInputTipsSearchRequest alloc] init];
-//    //关键字
-//    tipsRequest.keywords = _searchTxt.text;
-//    //城市
-//    tipsRequest.city = @"杭州";
-//    //执行搜索
-//    [_searchAPI AMapInputTipsSearch: tipsRequest];
-
 }
-/*  返回浙大的轮廓点  多边形 */
-- (NSArray *)returnZheDaPoint
-{
-//    AMapGeoPoint *Point1 = [[AMapGeoPoint alloc]init];
-//    Point1.latitude = 30.31011561;
-//    Point1.longitude = 120.08065224;
-//    AMapGeoPoint *Point2 = [[AMapGeoPoint alloc]init];
-//    Point2.latitude = 30.29509105;
-//    Point2.longitude = 120.08273363;
-//    AMapGeoPoint *Point3 = [[AMapGeoPoint alloc]init];
-//    Point3.latitude = 30.30937463;
-//    Point3.longitude = 120.08902073;
-//    AMapGeoPoint *Point4 = [[AMapGeoPoint alloc]init];
-//    Point4.latitude = 30.29477609;
-//    Point4.longitude = 120.09251833;
-    
-    //玉泉
-    AMapGeoPoint *Point1 = [[AMapGeoPoint alloc]init];
-    Point1.latitude = 30.26405277;
-    Point1.longitude = 120.12346029;
-    //之江
-    AMapGeoPoint *Point2 = [[AMapGeoPoint alloc]init];
-    Point2.latitude = 30.19258113;
-    Point2.longitude = 120.12537224;
-    //紫金港
-    AMapGeoPoint *Point3 = [[AMapGeoPoint alloc]init];
-    Point3.latitude = 30.30446546;
-    Point3.longitude = 120.08666039;
-    //华家池
-    AMapGeoPoint *Point4 = [[AMapGeoPoint alloc]init];
-    Point4.latitude = 30.26979791;
-    Point4.longitude = 120.19596577;
-    
-    NSArray *piontArr = [NSArray arrayWithObjects:Point1, Point2, Point3, Point4, nil];
-    
-    return piontArr;
-}
-
 #pragma campusTableView DataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -387,7 +265,6 @@
         [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27044654, 120.13240814)];
         //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.25595341, 120.11296749) animated:YES];
-
     }
     else if (indexPath.row == 1)
     {
@@ -504,19 +381,6 @@
     {
         return;
     }
-//    _tableVC.tableView.hidden = NO;
-//    // 通过 AMapPOISearchResponse 对象处理搜索结果
-//    NSString* strCount = [NSString stringWithFormat:@"count: %zd",response.count];
-//    NSString *strSuggestion = [NSString stringWithFormat:@"Suggestion: %@", response.suggestion];
-//    NSString *strPoi = @"";
-//    for (AMapPOI *p in response.pois)
-//    {
-//        strPoi = [NSString stringWithFormat:@"%@\nPOI: %@", strPoi, p.description];
-//    }
-//    NSString *result = [NSString stringWithFormat:@"%@ \n %@ \n %@", strCount, strSuggestion, strPoi];
-//    NSLog(@"Place: %@", result);
-//    self.tableVC.searchList = response.pois;
-//    [self.tableVC.tableView reloadData];
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
                                              initWithTitle:@"返回"
                                              style:UIBarButtonItemStylePlain
@@ -534,7 +398,6 @@
     VC.delegate = self;
     [self.navigationController pushViewController:VC animated:YES];
     VC.dataSourceArr = self.searchResultArr;
-
 }
 #pragma mark - viewDidAppear
 //- (void)viewDidAppear:(BOOL)animated
@@ -543,9 +406,15 @@
 //    // 点注释类
 //    MAPointAnnotation* pointAnnotation = [[MAPointAnnotation alloc] init];
 //    pointAnnotation.coordinate = CLLocationCoordinate2DMake(self.coordinate.latitude, self.coordinate.longitude);
-//    pointAnnotation.title = @"方恒国际";
-//    pointAnnotation.subtitle = @"阜通东大街6号";
+////    pointAnnotation.title = @"方恒国际";
+////    pointAnnotation.subtitle = @"阜通东大街6号";
 //    [self.mapView addAnnotation:pointAnnotation];
+//    
+//    AMapPOI* pt = [[AMapPOI alloc] init];
+//    pt.location.latitude = self.coordinate.latitude;
+//    pt.location.longitude = self.coordinate.longitude;
+//    NSString* st = [[NSString alloc] init];
+//    st = pt.name;
 //}
 /**
  *  添加大头针
@@ -556,10 +425,10 @@
     
     MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
     if ([place isKindOfClass:[AMapPOI class]]) {
-        AMapPOI *pPoi = (AMapPOI *)place;
-        pointAnnotation.coordinate = CLLocationCoordinate2DMake(pPoi.location.latitude, pPoi.location.longitude);
-        pointAnnotation.title = pPoi.name;
-        pointAnnotation.subtitle = pPoi.address;
+        self.pPoi = (AMapPOI *)place;
+        pointAnnotation.coordinate = CLLocationCoordinate2DMake(self.pPoi.location.latitude, self.pPoi.location.longitude);
+        pointAnnotation.title = self.pPoi.name;
+        pointAnnotation.subtitle = self.pPoi.address;
     }else if ([place isKindOfClass:[AMapTip class]]) {
         AMapTip *pTip = (AMapTip *)place;
         pointAnnotation.coordinate = CLLocationCoordinate2DMake(pTip.location.latitude, pTip.location.longitude);
@@ -572,8 +441,6 @@
     [self.mapView addAnnotation:pointAnnotation];
     // 3.选中 ===>默认弹出气泡
     [self.mapView selectAnnotation:pointAnnotation animated:YES];
-    // 弹出确定按钮
-    //[self popConfirmButton];
 }
 /**
  *  移除上一个已经添加大头针
@@ -602,7 +469,7 @@
         annotationView.canShowCallout= YES;       //设置气泡可以弹出，默认为NO
         annotationView.animatesDrop = YES;        //设置标注动画显示，默认为NO
         annotationView.draggable = YES;        //设置标注可以拖动，默认为NO
-        annotationView.pinColor = MAPinAnnotationColorPurple;
+        annotationView.pinColor = MAPinAnnotationColorPurple; // 紫色大头针
         return annotationView;
     }
     return nil;
@@ -636,9 +503,9 @@
 // 实现选中地点的回调方法
 - (void)cellDidClickCallbackWith:(AMapPOI *)place
 {
+    self.pPoi = place;
     // 添加大头针
     [self addAnnotationWith:place];
-
     CGFloat wth = self.view.frame.size.width / 2;
     UIButton* detailsBtn = [[UIButton alloc] init];
     [detailsBtn setTitle:@"详情" forState:UIControlStateNormal];
@@ -651,12 +518,12 @@
         make.width.offset(wth);
         make.height.offset(60);
     }];
-    UIButton* goHere = [[UIButton alloc] init];
-    [goHere setTitle:@"去这里" forState:UIControlStateNormal];
-    goHere.backgroundColor = [UIColor whiteColor];
-    [goHere setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
-    [self.mapView addSubview:goHere];
-    [goHere mas_makeConstraints:^(MASConstraintMaker *make) {
+    UIButton* goHereBtn = [[UIButton alloc] init];
+    [goHereBtn setTitle:@"去这里" forState:UIControlStateNormal];
+    goHereBtn.backgroundColor = [UIColor whiteColor];
+    [goHereBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+    [self.mapView addSubview:goHereBtn];
+    [goHereBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.bottom.equalTo(self.mapView.mas_bottom).offset(0);
         make.right.equalTo(self.mapView.mas_right).offset(0);
         make.width.offset(wth);
@@ -664,12 +531,24 @@
     }];
 
     [detailsBtn addTarget:self action:@selector(goDetails) forControlEvents:UIControlEventTouchUpInside];
+    [goHereBtn addTarget:self action:@selector(goHere) forControlEvents:UIControlEventTouchUpInside];
 }
-#pragma mark - 跳转搜索结果界面
+#pragma mark - 跳转详情界面
 - (void)goDetails
 {
-    PlaceResultViewController* tl = [[PlaceResultViewController alloc] init];
+    DetailsViewController* tl = [[DetailsViewController alloc] init];
     [self.navigationController pushViewController:tl animated:YES];
+    // 类属性传值
+    tl.name = self.pPoi.name;
+    tl.address = self.pPoi.address;
+}
+#pragma mark - 去这里
+- (void)goHere
+{
+    // 步行路径规划
+    //[self pathPlanning];
+    PathPlanningViewController* pathPlanning = [[PathPlanningViewController alloc] init];
+    [self.navigationController pushViewController:pathPlanning animated:YES];
 }
 /**
  *  移除上一个已经添加大头针
@@ -685,101 +564,41 @@
 //    }
 //}
 #pragma mark - 单击地图时显示出点击位置名称
-//- (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois
-//{
+- (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois
+{
 //    if (pois)
 //    {
-//        [self.mapView removeAnnotationsAndOverlays];
-//        MATouchPoi* poi = [pois firstObject];
-//        [self.mapView addPointAnnotation:poi];
+////        [self.mapView removeAnnotationsAndOverlays];
+//        // 每添加一个大头针之前先清空之前已经添加的大头针
+////        [self removePreviousAnnotation];
+//        AMapPOI* poi = [[AMapPOI alloc] init];
+//        poi = [pois firstObject];
+////        [self.mapView addPointAnnotation:poi];
+//        MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
+//        pointAnnotation.coordinate = CLLocationCoordinate2DMake(self.coordinate.latitude, self.coordinate.longitude);
+//        pointAnnotation.title = poi.name;
+////        pointAnnotation.subtitle = poi.address;
+//        [self.mapView addAnnotation:pointAnnotation];
 //    }
-//}
+    
+    // 每添加一个大头针之前先清空之前已经添加的大头针
+    [self removePreviousAnnotation];
+    [self cellDidClickCallbackWith:_pPoi];
+    
+    MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
+    self.pPoi = [pois firstObject];
+//    pointAnnotation.coordinate = CLLocationCoordinate2DMake(self.pPoi.location.latitude, self.pPoi.location.longitude);
+    pointAnnotation.coordinate = CLLocationCoordinate2DMake(self.coordinate.latitude, self.coordinate.longitude);
+    pointAnnotation.title = self.pPoi.name;
+//    pointAnnotation.subtitle = self.pPoi.address;
+    // 1.刷新地图
+    self.mapView.centerCoordinate = pointAnnotation.coordinate;
+    // 2.添加大头针
+    [self.mapView addAnnotation:pointAnnotation];
+    // 3.选中 ===>默认弹出气泡
+    [self.mapView selectAnnotation:pointAnnotation animated:YES];
+}
 /*
- //    MACoordinateBounds coordinateBounds = MACoordinateBoundsMake(CLLocationCoordinate2DMake
- //                                                                 (39.939577, 116.388331),CLLocationCoordinate2DMake(39.935029, 116.384377));
- //    MAGroundOverlay *groundOverlay = [MAGroundOverlay groundOverlayWithBounds:coordinateBounds icon:[UIImage imageNamed:@"GWF"]];
- //    [_mapView addOverlay:groundOverlay];
- //    _mapView.visibleMapRect = groundOverlay.boundingMapRect;
- //    MACoordinateBounds coordinateBounds = MACoordinateBoundsMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814),CLLocationCoordinate2DMake(30.25595341, 120.11296749));
- //    MAGroundOverlay* groundOverlay = [MAGroundOverlay groundOverlayWithBounds:coordinateBounds icon:nil];
- //    [self.mapView addOverlay:groundOverlay];
- //    self.mapView.visibleMapRect = groundOverlay.boundingMapRect;
- 
- //self.mapView = MACoordinateBoundsMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), CLLocationCoordinate2DMake(30.25595341, 120.11296749));
- //self.mapView setRegion:MACoordinateRegion
- 
- //    MACoordinateBounds j = MACoordinateBoundsMake(CLLocationCoordinate2DMake(30.27044654, 120.13240814), CLLocationCoordinate2DMake(30.25595341, 120.13240814));
- //    CLLocationCoordinate2D cd[2];
- //    cd[0].latitude = 30.27044654;
- //    cd[0].longitude = 120.13240814;
- //    cd[1].latitude = 30.25595341;
- //    cd[1].longitude = 120.13240814;
- //    MAPolygon* polygon = [MAPolygon polygonWithPoints:cd count:2];
- //    [self.mapView addOverlay:polygon];
- 
- //    NSURL *scheme = [NSURL URLWithString:@"iosamap://"];
- //    BOOL canOpen = [[UIApplication sharedApplication] canOpenURL:scheme];
- //    NSLog(@"可以打开 = %d",canOpen);
- //    NSURL *myLocationScheme = [NSURL URLWithString:@"iosamap://myLocation?sourceApplication=applicationName"]; if ([[UIDevice currentDevice].systemVersion integerValue] >= 10) {
- //        //iOS10以后,使用新API
- //        [[UIApplication sharedApplication] openURL:myLocationScheme options:@{} completionHandler:^(BOOL success) { NSLog(@"scheme调用结束"); }]; } else {
- //            //iOS10以前,使用旧API
- //            [[UIApplication sharedApplication] openURL:myLocationScheme]; }
- 
- //    self.mapView
- //self.mapView.mapType = MAMapTypeStandard;//映射类型标准
- //self.mapView.autoresizingMask=UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
- //self.mapView.showsScale=NO;//设置成NO表示不显示比例尺；YES表示显示比例尺
- //self.mapView.showsCompass=YES; // 设置成NO表示关闭指南针；YES表示显示指南针
- // 显示室内地图
- //self.mapView.showsIndoorMap=YES;
- //self.definesPresentationContext=YES;
- //显示指定区域
- //需要一个中心点，和纵向跨度、横向跨度
- //    CLLocationCoordinate2D coordinate;
- //    coordinate.latitude = 30.30446546;
- //    coordinate.longitude = 120.08666039;
- //    MACoordinateSpan span;
- //    span.latitudeDelta = 0.02154799;
- //    span.longitudeDelta = 0.001202924;
- 
- // 初始化AMapLocationManager对象,设置代理。
- //    self.locationManager = [[AMapLocationManager alloc]init];
- //    self.locationManager.delegate=self;
- //    //1.设置期望定位精度
- //    // 带逆地理信息的一次定位（返回坐标和地址信息）
- //    [self.locationManager setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
- //    // 定位超时时间，最低2s，此处设置为2s
- //    self.locationManager.locationTimeout = 2;
- //    // 逆地理请求请求超时时间，最低2s，此处设置为2s
- //    self.locationManager.reGeocodeTimeout = 2;
- //2.请求定位并拿到结果
- //带逆地理（返回坐标和地址信息）。将下面代码中的 YES 改成 NO ，则不会返回地址信息。
- //    [self.locationManager requestLocationWithReGeocode:YES completionBlock:^(CLLocation *location, AMapLocationReGeocode *regeocode, NSError *error) {
- //        if (error)
- //        {
- //            NSLog(@"locError:{%ld - %@};", (long)error.code, error.localizedDescription);
- //            if (error.code == AMapLocationErrorLocateFailed)
- //            {
- //                return;
- //            }
- //        }
- //        NSLog(@"location:%@", location);
- //        if (regeocode)
- //        {
- //
- //            NSLog(@"reGeocode:%@", regeocode);
- //        }
- //    }];
- // 调用AMaplocationManager提供的startUpdatingLocation方法开启持续定位。
- //    [self.locationManager startUpdatingLocation];
- //    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://portal.zfsoft.com:9090/zftal-mobile/newmobile/MobileLoginServlet/getMapList"]];
- //    NSURLSession* session=[NSURLSession sharedSession];
- //    NSURLSessionDataTask* task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
- //        self.dic=[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
- //        NSLog(@"dic = %@",_dic);
- //    }];
- //    [task resume];
  // 接收位置更新,实现AMapLocationManagerDelegate代理的amaplocationManager:didUpdateLocation方法,处理位置更新
  //- (void)amapLocationManager:(AMapLocationManager *)manager didUpdateLocation:(CLLocation *)location reGeocode:(AMapLocationReGeocode *)reGeocode
  //{
@@ -799,42 +618,67 @@
  //}
 
  */
-
 //单击地图时显示出点击位置名称
-- (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois
+//- (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois
+//{
+//    // 添加大头针
+//    //[self addAnnotationWith:nil];
+////    NSString* dd = [[NSString alloc] init];
+////    [self cellDidClickCallbackWith:(AMapPOI *)dd];
+////    AMapPOI *poi = (AMapPOI *)pois;
+////    AMapPOI* poi = [[AMapPOI alloc] init];
+//////    [self addAnnotationWith:poi];
+////    [self addAnnotationWith:(AMapPOI *)poi];
+//
+//    MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
+//    AMapPOI* place = [[AMapPOI alloc] init];
+//    if ([place isKindOfClass:[AMapPOI class]]) {
+//        AMapPOI *pPoi = (AMapPOI *)place;
+//        pointAnnotation.coordinate = CLLocationCoordinate2DMake(self.coordinate.latitude, self.coordinate.longitude);//pPoi.location.longitude
+////        pointAnnotation.title = pPoi.name;
+////        pointAnnotation.title = (NSString *)[pois[0] objectForKey:@"_name"];
+//        pointAnnotation.title = [pois[0] valueForKey:@"name"];
+////        pointAnnotation.subtitle = pPoi.address;
+//        pointAnnotation.subtitle = [pois[0] valueForKey:@"uid"];
+//    }else if ([place isKindOfClass:[AMapTip class]]) {
+//        AMapTip *pTip = (AMapTip *)place;
+//        pointAnnotation.coordinate = CLLocationCoordinate2DMake(pTip.location.latitude, pTip.location.longitude);
+//        pointAnnotation.title = pTip.name;
+//        pointAnnotation.subtitle = pTip.address;
+//    }
+//    // 1.刷新地图
+//    self.mapView.centerCoordinate = pointAnnotation.coordinate;
+//    // 2.添加大头针
+//    [self.mapView addAnnotation:pointAnnotation];
+//    // 3.选中 ===>默认弹出气泡
+//    [self.mapView selectAnnotation:pointAnnotation animated:YES];
+//}
+#pragma mark - 路径规划
+- (void)pathPlanning
 {
-    // 添加大头针
-    //[self addAnnotationWith:nil];
-//    NSString* dd = [[NSString alloc] init];
-//    [self cellDidClickCallbackWith:(AMapPOI *)dd];
-//    AMapPOI *poi = (AMapPOI *)pois;
-//    AMapPOI* poi = [[AMapPOI alloc] init];
-////    [self addAnnotationWith:poi];
-//    [self addAnnotationWith:(AMapPOI *)poi];
-
-    MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
-    AMapPOI* place = [[AMapPOI alloc] init];
-    if ([place isKindOfClass:[AMapPOI class]]) {
-        AMapPOI *pPoi = (AMapPOI *)place;
-        pointAnnotation.coordinate = CLLocationCoordinate2DMake(self.coordinate.latitude, self.coordinate.longitude);//pPoi.location.longitude
-//        pointAnnotation.title = pPoi.name;
-//        pointAnnotation.title = (NSString *)[pois[0] objectForKey:@"_name"];
-        pointAnnotation.title = [pois[0] valueForKey:@"name"];
-//        pointAnnotation.subtitle = pPoi.address;
-        pointAnnotation.subtitle = [pois[0] valueForKey:@"uid"];
-    }else if ([place isKindOfClass:[AMapTip class]]) {
-        AMapTip *pTip = (AMapTip *)place;
-        pointAnnotation.coordinate = CLLocationCoordinate2DMake(pTip.location.latitude, pTip.location.longitude);
-        pointAnnotation.title = pTip.name;
-        pointAnnotation.subtitle = pTip.address;
-    }
-    // 1.刷新地图
-    self.mapView.centerCoordinate = pointAnnotation.coordinate;
-    // 2.添加大头针
-    [self.mapView addAnnotation:pointAnnotation];
-    // 3.选中 ===>默认弹出气泡
-    [self.mapView selectAnnotation:pointAnnotation animated:YES];
+    // 设置步行线路规划参数
+    // 步行路线规划的搜索参数类为 AMapWalkingRouteSearchRequest，origin（起点坐标）和destination（终点坐标）为必设参数。
+    // 地图行走路线搜索请求类
+    AMapWalkingRouteSearchRequest* navi = [[AMapWalkingRouteSearchRequest alloc] init];
+    /* 出发点. */
+    self.startAnnotation = [[MAPointAnnotation alloc] init];
+    self.startAnnotation.coordinate = self.mapView.userLocation.location.coordinate;
+    //self.startAnnotation.coordinate = self.mapView.userLocation.coordinate;
+    navi.origin = [AMapGeoPoint locationWithLatitude:self.startAnnotation.coordinate.latitude longitude:self.startAnnotation.coordinate.longitude];
+    /* 目的地. */
+    navi.destination = [AMapGeoPoint locationWithLatitude:self.coordinate.latitude longitude:self.coordinate.longitude];
+    // 调用 AMapSearchAPI 的 AMapWalkingRouteSearch 并发起步行路线规划。
+    [self.searchAPI AMapWalkingRouteSearch:navi];
 }
-
-
+#pragma mark - 当检索成功时，会进到 onRouteSearchDone 回调函数中，在该回调中，通过解析 AMapRouteSearchResponse 获取将步行规划路线的数据显示在地图上。
+- (void)onRouteSearchDone:(AMapRouteSearchBaseRequest *)request response:(AMapRouteSearchResponse *)response
+{
+    if (response.route == nil)
+    {
+        return;
+    }
+    // 解析response获取路径信息，具体解析见 Demo
+    self.route = response.route;
+    //self.navigationItem.titleView
+}
 @end

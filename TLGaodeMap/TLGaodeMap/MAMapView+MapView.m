@@ -42,12 +42,12 @@
     [self removeOverlaysFun];
 }
 //添加大头针
-- (void)addPointAnnotation:(MATouchPoi *)poi;
+- (void)addPointAnnotation:(AMapPOI *)poi;
 {
     MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
-    pointAnnotation.coordinate = CLLocationCoordinate2DMake(poi.coordinate.latitude, poi.coordinate.longitude);
+    pointAnnotation.coordinate = CLLocationCoordinate2DMake(poi.location.latitude, poi.location.longitude);
     pointAnnotation.title = poi.name;
-    //    pointAnnotation.subtitle = poi.address;
+//    pointAnnotation.subtitle = poi.address;
     [self addAnnotation:pointAnnotation];
 }
 

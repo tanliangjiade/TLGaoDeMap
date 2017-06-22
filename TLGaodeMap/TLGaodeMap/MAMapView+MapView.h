@@ -18,5 +18,5 @@
 //清除大头针和路线
 - (void)removeAnnotationsAndOverlays;
 //添加大头针
-- (void)addPointAnnotation:(MATouchPoi *)poi;
+- (void)addPointAnnotation:(AMapPOI *)poi;
 @end
