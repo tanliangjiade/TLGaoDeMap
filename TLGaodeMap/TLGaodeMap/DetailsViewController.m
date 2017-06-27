@@ -22,8 +22,14 @@
     UIImageView* poiImageView = [[UIImageView alloc] init];
     [self.view addSubview:poiImageView];
     poiImageView.frame = CGRectMake(0, 0, self.view.frame.size.width,300);
-    poiImageView.image = [UIImage imageNamed:@"timg"];
-    
+    if (self.imageView)
+    {
+        poiImageView.image = _imageView.image;
+    }
+    else
+    {
+        poiImageView.image = [UIImage imageNamed:@"timg"];
+    }
     UIView* poiNameView = [[UIView alloc] init];
     poiNameView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:poiNameView];

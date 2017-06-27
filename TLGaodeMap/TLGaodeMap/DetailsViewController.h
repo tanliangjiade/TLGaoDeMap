@@ -11,4 +11,5 @@
 @interface DetailsViewController : UIViewController
 @property(nonatomic,strong) NSString* name;
 @property(nonatomic,strong) NSString* address;
+@property(nonatomic,strong) UIImageView* imageView;
 @end
