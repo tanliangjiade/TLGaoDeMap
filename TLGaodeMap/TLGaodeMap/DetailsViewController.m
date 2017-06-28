@@ -18,6 +18,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"详情";
+    
     [self.view setBackgroundColor:[UIColor colorWithRed:235/255.0 green:235/255.0 blue:241/255.0 alpha:1]];
     UIImageView* poiImageView = [[UIImageView alloc] init];
     [self.view addSubview:poiImageView];
@@ -40,10 +41,13 @@
     }];
     UILabel* poiNameLab = [[UILabel alloc] init];
     [poiNameView addSubview:poiNameLab];
-    //poiNameLab.text = @"好食堂(东山弄店)";
+    poiNameLab.lineBreakMode = NSLineBreakByTruncatingTail;
+    poiNameLab.numberOfLines = 1;
+    //poiNameLab.text = @"好食堂(东山弄店)好食堂(东山弄店)好食堂(东山弄店)";
     poiNameLab.text = _name;
     [poiNameLab mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(poiNameView.mas_left).offset(10);
+        make.right.equalTo(poiNameView.mas_right).offset(0);
         make.centerY.equalTo(poiNameView.mas_centerY);
     }];
     
@@ -67,11 +71,14 @@
     
     UILabel* poiAddressLab = [[UILabel alloc] init];
     [poiAddressView addSubview:poiAddressLab];
-    //poiAddressLab.text = @"玉古路137号(玉泉饭店后门)";
+    poiAddressLab.lineBreakMode = NSLineBreakByTruncatingTail;
+    poiAddressLab.numberOfLines = 1;
+    //poiAddressLab.text = @"玉古路137号(玉泉饭店后门)玉古路137号(玉泉饭店后门)玉古路137号(玉泉饭店后门)";
     poiAddressLab.text = _address;
     poiAddressLab.font = [UIFont systemFontOfSize:13];
     [poiAddressLab mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(mapMark.mas_right).offset(15);
+        make.right.equalTo(poiAddressView.mas_right).offset(0);
         make.centerY.equalTo(poiAddressView.mas_centerY);
     }];
 

@@ -69,14 +69,15 @@
 @property (nonatomic,strong) DetailsViewController* details;
 @property (nonatomic,strong) MAPointAnnotation *pointAnnotation;
 @property (nonatomic,strong) MAUserLocation *userLocation;
-@property (nonatomic,strong) MAAnnotationView* view;
+
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationController.navigationBar.backgroundColor = [UIColor colorWithRed:17/255.0 green:137/255.0 blue:232/255.0 alpha:1];
+    //self.navigationController.navigationBar.backgroundColor = [UIColor colorWithRed:17/255.0 green:137/255.0 blue:232/255.0 alpha:1];
+    self.navigationController.navigationBar.barStyle    = UIBarStyleBlack;
     self.mapView.touchPOIEnabled = YES;
     // 初始化导航栏UI
     [self initNavigationUI];
@@ -87,7 +88,7 @@
     // 初始化搜索栏
     //[self initSearch];
     // 解析接口
-    [self ParseInterface];
+//    [self ParseInterface];
     // 搜索服务对象
     self.searchAPI = [[AMapSearchAPI alloc] init];
     // 遵守代理
@@ -233,7 +234,8 @@
 {
     if (tableView == self.campusTableView)
     {
-        return self.rowCountArray.count;
+        //return self.rowCountArray.count;
+        return 1;
     }
     else
     {
@@ -254,7 +256,8 @@
     }
     if (tableView == self.campusTableView)
     {
-        cell.textLabel.text = self.rowCountArray[indexPath.row];
+        //cell.textLabel.text = self.rowCountArray[indexPath.row];
+        cell.textLabel.text = @"工院九里校区";
     }
     else
     {
@@ -281,48 +284,50 @@
         _coordinate.latitude = 34.299529;
         _coordinate.longitude = 117.142651;
         [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(34.299529, 117.142651) animated:YES];
+        // 设置地图的缩放级别 范围3-19
+        [self.mapView setZoomLevel:15.5 animated:YES];//17.5
     }
-    else if (indexPath.row == 1)
-    {
-        // 之江校区
-        //CLLocationCoordinate2D coordinate;
-        _coordinate.latitude = 30.19258113;
-        _coordinate.longitude = 120.12537224;
-        MACoordinateSpan span;
-        span.latitudeDelta = 0.00763204;
-        span.longitudeDelta = 0.0102675;
-        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
-        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.19514054, 120.1307559)];
-        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.18855642, 120.12116432)];
-    }
-    else if (indexPath.row == 2)
-    {
-        //紫金港校区
-        //显示指定区域
-        //需要一个中心点，和纵向跨度、横向跨度
-        //CLLocationCoordinate2D coordinate;
-        _coordinate.latitude = 30.30446546;
-        _coordinate.longitude = 120.08666039;
-        MACoordinateSpan span;
-        span.latitudeDelta = 0.02154799;
-        span.longitudeDelta = 0.001202924;
-        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
-        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.31439469, 120.09236813)];
-        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.29497989, 120.08103848)];
-    }
-    else if (indexPath.row == 3)
-    {
-        // 华家池校区
-        //CLLocationCoordinate2D coordinate;
-        _coordinate.latitude = 30.26979791;
-        _coordinate.longitude = 120.19596577;
-        MACoordinateSpan span;
-        span.latitudeDelta = 0.01367672;
-        span.longitudeDelta = 0.00989199;
-        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
-        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27878562, 120.20270348)];
-        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.26258864, 120.18922806)];
-    }
+//    else if (indexPath.row == 1)
+//    {
+//        // 之江校区
+//        //CLLocationCoordinate2D coordinate;
+//        _coordinate.latitude = 30.19258113;
+//        _coordinate.longitude = 120.12537224;
+//        MACoordinateSpan span;
+//        span.latitudeDelta = 0.00763204;
+//        span.longitudeDelta = 0.0102675;
+//        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
+//        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.19514054, 120.1307559)];
+//        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.18855642, 120.12116432)];
+//    }
+//    else if (indexPath.row == 2)
+//    {
+//        //紫金港校区
+//        //显示指定区域
+//        //需要一个中心点，和纵向跨度、横向跨度
+//        //CLLocationCoordinate2D coordinate;
+//        _coordinate.latitude = 30.30446546;
+//        _coordinate.longitude = 120.08666039;
+//        MACoordinateSpan span;
+//        span.latitudeDelta = 0.02154799;
+//        span.longitudeDelta = 0.001202924;
+//        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
+//        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.31439469, 120.09236813)];
+//        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.29497989, 120.08103848)];
+//    }
+//    else if (indexPath.row == 3)
+//    {
+//        // 华家池校区
+//        //CLLocationCoordinate2D coordinate;
+//        _coordinate.latitude = 30.26979791;
+//        _coordinate.longitude = 120.19596577;
+//        MACoordinateSpan span;
+//        span.latitudeDelta = 0.01367672;
+//        span.longitudeDelta = 0.00989199;
+//        [_mapView showAppointRegionCoordinate:_coordinate andSpan:span];
+//        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.27878562, 120.20270348)];
+//        //[self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(30.26258864, 120.18922806)];
+//    }
     self.campusTableView.hidden = YES;
     self.isOpen = NO;
 }
@@ -550,6 +555,11 @@
     [self.navigationController pushViewController:tl animated:YES];
     // 类属性传值
     tl.name = self.pointAnnotation.title;
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithTitle:@"返回"
+                                             style:UIBarButtonItemStylePlain
+                                             target:self
+                                             action:nil];
 }
 - (void)goDetailsSearch
 {
@@ -560,6 +570,11 @@
     tl.address = self.pPoi.address;
     tl.imageView = (UIImageView *)self.pPoi.images[0];
 //    tl.imageView.image = self.view.image;
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithTitle:@"返回"
+                                             style:UIBarButtonItemStylePlain
+                                             target:self
+                                             action:nil];
 }
 #pragma mark - 去这里
 - (void)goHere
@@ -568,6 +583,14 @@
     //[self pathPlanning];
     PathPlanningViewController* pathPlanning = [[PathPlanningViewController alloc] init];
     [self.navigationController pushViewController:pathPlanning animated:YES];
+    // 属性传值
+    pathPlanning.endPoint = self.pointAnnotation.coordinate;
+    pathPlanning.currentPoint = self.mapView.userLocation.location.coordinate;
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithTitle:@"返回"
+                                             style:UIBarButtonItemStylePlain
+                                             target:self
+                                             action:nil];
 }
 - (void)goHereSearch
 {
@@ -575,6 +598,17 @@
     //[self pathPlanning];
     PathPlanningViewController* pathPlanning = [[PathPlanningViewController alloc] init];
     [self.navigationController pushViewController:pathPlanning animated:YES];
+    // 属性传值
+//    pathPlanning.endPoint = *((__bridge CLLocationCoordinate2D *)self.pPoi.location);
+    pathPlanning.currentPoint = self.mapView.userLocation.location.coordinate;
+    pathPlanning.endPoint = CLLocationCoordinate2DMake(self.pPoi.location.latitude, self.pPoi.location.longitude);
+//    pathPlanning.endPoint.latitude = (CLLocationDegrees *)self.pPoi.location.latitude;
+    //pathPlanning.locations = self.pPoi.location;
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithTitle:@"返回"
+                                             style:UIBarButtonItemStylePlain
+                                             target:self
+                                             action:nil];
 }
 #pragma mark - 单击地图时显示出点击位置名称
 - (void)mapView:(MAMapView *)mapView didTouchPois:(NSArray *)pois

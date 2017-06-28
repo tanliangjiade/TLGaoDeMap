@@ -230,7 +230,7 @@
 					279021E01EE6598800A4A7A1 = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = C8BSBVK4XU;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 0;
@@ -466,6 +466,8 @@
 			baseConfigurationReference = C8394631F332A9003C39C416 /* Pods-TLGaodeMap.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: ZHENGFANG SOFTWARE CO.,LTD (C8BSBVK4XU)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ZHENGFANG SOFTWARE CO.,LTD (C8BSBVK4XU)";
 				DEVELOPMENT_TEAM = C8BSBVK4XU;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -474,8 +476,11 @@
 				INFOPLIST_FILE = TLGaodeMap/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.zfsoft.TLGaodeMap;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.zfsoft.tlgaodemap-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "90efec35-4948-4b92-82e6-3fcd9783ccaf";
+				PROVISIONING_PROFILE_SPECIFIER = XZGYXYDT_628;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -484,6 +489,8 @@
 			baseConfigurationReference = 5490DDEBFD035748352A32DE /* Pods-TLGaodeMap.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: ZHENGFANG SOFTWARE CO.,LTD (C8BSBVK4XU)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ZHENGFANG SOFTWARE CO.,LTD (C8BSBVK4XU)";
 				DEVELOPMENT_TEAM = C8BSBVK4XU;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -492,8 +499,11 @@
 				INFOPLIST_FILE = TLGaodeMap/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.zfsoft.TLGaodeMap;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.zfsoft.tlgaodemap-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "90efec35-4948-4b92-82e6-3fcd9783ccaf";
+				PROVISIONING_PROFILE_SPECIFIER = XZGYXYDT_628;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

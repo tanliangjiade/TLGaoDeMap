@@ -7,7 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import <MAMapKit/MAMapKit.h>
+#import <AMapSearchKit/AMapSearchKit.h>
 @interface PathPlanningViewController : UIViewController
+/**
+    属性接收终点值
+ */
+@property(nonatomic) CLLocationCoordinate2D endPoint;
+@property(nonatomic) CLLocationCoordinate2D currentPoint;
 
+@property (nonatomic, copy)   AMapGeoPoint *locations;
+
+@property (nonatomic, copy)   AMapGeoPoint *loca;
 @end
