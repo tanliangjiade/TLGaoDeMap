@@ -1,9 +1,9 @@
 //
 //  ResultPlaceCell.h
-//  DaChe
+//  TLGaodeMap
 //
-//  Created by 张森明 on 16/8/22.
-//  Copyright © 2016年 666GPS. All rights reserved.
+//  Created by TAN on 2017/6/14.
+//  Copyright © 2017年 zfsoft.com. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

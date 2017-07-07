@@ -29,8 +29,6 @@
 		27E5BEA01F020925009A79D2 /* MANaviPolyline.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E5BE9F1F020925009A79D2 /* MANaviPolyline.m */; };
 		27E5BEA31F020939009A79D2 /* LineDashPolyline.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E5BEA21F020939009A79D2 /* LineDashPolyline.m */; };
 		27E5BEA61F02095F009A79D2 /* CommonUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E5BEA51F02095F009A79D2 /* CommonUtility.m */; };
-		27E5BEA91F022F0D009A79D2 /* SelectableOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E5BEA81F022F0D009A79D2 /* SelectableOverlay.m */; };
-		27E5BEAC1F022F66009A79D2 /* RouteCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E5BEAB1F022F66009A79D2 /* RouteCollectionViewCell.m */; };
 		27F269111EF8FBA900F914E7 /* DetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27F269101EF8FBA900F914E7 /* DetailsViewController.m */; };
 		C553439E1A371699C7E21177 /* libPods-TLGaodeMap.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B7A7FA6B15435A81C927257 /* libPods-TLGaodeMap.a */; };
 /* End PBXBuildFile section */
@@ -77,10 +75,6 @@
 		27E5BEA21F020939009A79D2 /* LineDashPolyline.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineDashPolyline.m; sourceTree = "<group>"; };
 		27E5BEA41F02095F009A79D2 /* CommonUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonUtility.h; sourceTree = "<group>"; };
 		27E5BEA51F02095F009A79D2 /* CommonUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonUtility.m; sourceTree = "<group>"; };
-		27E5BEA71F022F0D009A79D2 /* SelectableOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectableOverlay.h; sourceTree = "<group>"; };
-		27E5BEA81F022F0D009A79D2 /* SelectableOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectableOverlay.m; sourceTree = "<group>"; };
-		27E5BEAA1F022F66009A79D2 /* RouteCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouteCollectionViewCell.h; sourceTree = "<group>"; };
-		27E5BEAB1F022F66009A79D2 /* RouteCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RouteCollectionViewCell.m; sourceTree = "<group>"; };
 		27F2690F1EF8FBA900F914E7 /* DetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsViewController.h; sourceTree = "<group>"; };
 		27F269101EF8FBA900F914E7 /* DetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsViewController.m; sourceTree = "<group>"; };
 		5490DDEBFD035748352A32DE /* Pods-TLGaodeMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TLGaodeMap.release.xcconfig"; path = "Pods/Target Support Files/Pods-TLGaodeMap/Pods-TLGaodeMap.release.xcconfig"; sourceTree = "<group>"; };
@@ -109,6 +103,60 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		2708397B1F0F27C900EAA3B6 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				279021EA1EE6598800A4A7A1 /* ViewController.h */,
+				279021EB1EE6598800A4A7A1 /* ViewController.m */,
+				2700E2EF1EEF7C680017DA4E /* SearchViewController.h */,
+				2700E2F01EEF7C680017DA4E /* SearchViewController.m */,
+				27F2690F1EF8FBA900F914E7 /* DetailsViewController.h */,
+				27F269101EF8FBA900F914E7 /* DetailsViewController.m */,
+				27C42A5F1EF779A000357CB5 /* PathPlanningViewController.h */,
+				27C42A601EF779A000357CB5 /* PathPlanningViewController.m */,
+				27471AC51EF0E7AC00525DA9 /* PlaceResultViewController.h */,
+				27471AC61EF0E7AC00525DA9 /* PlaceResultViewController.m */,
+			);
+			name = Controller;
+			sourceTree = "<group>";
+		};
+		2708397C1F0F284000EAA3B6 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				27E5BE9B1F020882009A79D2 /* MANaviRoute.h */,
+				27E5BE9C1F020882009A79D2 /* MANaviRoute.m */,
+				27E5BEA41F02095F009A79D2 /* CommonUtility.h */,
+				27E5BEA51F02095F009A79D2 /* CommonUtility.m */,
+				274CC7C41EEFD617009FD9F0 /* MAMapView+MapView.h */,
+				274CC7C51EEFD617009FD9F0 /* MAMapView+MapView.m */,
+				276016A41EE8103C00B69CE2 /* TLTextField.h */,
+				276016A51EE8103C00B69CE2 /* TLTextField.m */,
+				27471ABF1EF0E30E00525DA9 /* PullDownTableView.h */,
+				27471AC01EF0E30E00525DA9 /* PullDownTableView.m */,
+				27471AC21EF0E34C00525DA9 /* SearchReultCell.h */,
+				27471AC31EF0E34C00525DA9 /* SearchReultCell.m */,
+				27471AC81EF0E86000525DA9 /* ResultPlaceCell.h */,
+				27471AC91EF0E86000525DA9 /* ResultPlaceCell.m */,
+				27471ACA1EF0E86000525DA9 /* ResultPlaceCell.xib */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		2708397D1F0F284500EAA3B6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				27E5BE981F0207D5009A79D2 /* MANaviAnnotation.h */,
+				27E5BE991F0207D5009A79D2 /* MANaviAnnotation.m */,
+				27E5BE9E1F020925009A79D2 /* MANaviPolyline.h */,
+				27E5BE9F1F020925009A79D2 /* MANaviPolyline.m */,
+				27E5BEA11F020939009A79D2 /* LineDashPolyline.h */,
+				27E5BEA21F020939009A79D2 /* LineDashPolyline.m */,
+				274CC7C71EF01143009FD9F0 /* AMapSearchObject+SearchObject.h */,
+				274CC7C81EF01143009FD9F0 /* AMapSearchObject+SearchObject.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 		279021D81EE6598800A4A7A1 = {
 			isa = PBXGroup;
 			children = (
@@ -132,43 +180,9 @@
 			children = (
 				279021E71EE6598800A4A7A1 /* AppDelegate.h */,
 				279021E81EE6598800A4A7A1 /* AppDelegate.m */,
-				279021EA1EE6598800A4A7A1 /* ViewController.h */,
-				279021EB1EE6598800A4A7A1 /* ViewController.m */,
-				2700E2EF1EEF7C680017DA4E /* SearchViewController.h */,
-				2700E2F01EEF7C680017DA4E /* SearchViewController.m */,
-				27F2690F1EF8FBA900F914E7 /* DetailsViewController.h */,
-				27F269101EF8FBA900F914E7 /* DetailsViewController.m */,
-				27E5BEA71F022F0D009A79D2 /* SelectableOverlay.h */,
-				27E5BEA81F022F0D009A79D2 /* SelectableOverlay.m */,
-				27E5BEAA1F022F66009A79D2 /* RouteCollectionViewCell.h */,
-				27E5BEAB1F022F66009A79D2 /* RouteCollectionViewCell.m */,
-				27C42A5F1EF779A000357CB5 /* PathPlanningViewController.h */,
-				27C42A601EF779A000357CB5 /* PathPlanningViewController.m */,
-				27E5BE981F0207D5009A79D2 /* MANaviAnnotation.h */,
-				27E5BE991F0207D5009A79D2 /* MANaviAnnotation.m */,
-				27E5BE9B1F020882009A79D2 /* MANaviRoute.h */,
-				27E5BE9C1F020882009A79D2 /* MANaviRoute.m */,
-				27E5BE9E1F020925009A79D2 /* MANaviPolyline.h */,
-				27E5BE9F1F020925009A79D2 /* MANaviPolyline.m */,
-				27E5BEA11F020939009A79D2 /* LineDashPolyline.h */,
-				27E5BEA21F020939009A79D2 /* LineDashPolyline.m */,
-				27E5BEA41F02095F009A79D2 /* CommonUtility.h */,
-				27E5BEA51F02095F009A79D2 /* CommonUtility.m */,
-				274CC7C41EEFD617009FD9F0 /* MAMapView+MapView.h */,
-				274CC7C51EEFD617009FD9F0 /* MAMapView+MapView.m */,
-				274CC7C71EF01143009FD9F0 /* AMapSearchObject+SearchObject.h */,
-				274CC7C81EF01143009FD9F0 /* AMapSearchObject+SearchObject.m */,
-				276016A41EE8103C00B69CE2 /* TLTextField.h */,
-				276016A51EE8103C00B69CE2 /* TLTextField.m */,
-				27471ABF1EF0E30E00525DA9 /* PullDownTableView.h */,
-				27471AC01EF0E30E00525DA9 /* PullDownTableView.m */,
-				27471AC21EF0E34C00525DA9 /* SearchReultCell.h */,
-				27471AC31EF0E34C00525DA9 /* SearchReultCell.m */,
-				27471AC51EF0E7AC00525DA9 /* PlaceResultViewController.h */,
-				27471AC61EF0E7AC00525DA9 /* PlaceResultViewController.m */,
-				27471AC81EF0E86000525DA9 /* ResultPlaceCell.h */,
-				27471AC91EF0E86000525DA9 /* ResultPlaceCell.m */,
-				27471ACA1EF0E86000525DA9 /* ResultPlaceCell.xib */,
+				2708397B1F0F27C900EAA3B6 /* Controller */,
+				2708397D1F0F284500EAA3B6 /* Model */,
+				2708397C1F0F284000EAA3B6 /* View */,
 				279021ED1EE6598800A4A7A1 /* Main.storyboard */,
 				279021F01EE6598800A4A7A1 /* Assets.xcassets */,
 				279021F21EE6598800A4A7A1 /* LaunchScreen.storyboard */,
@@ -230,7 +244,7 @@
 					279021E01EE6598800A4A7A1 = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = C8BSBVK4XU;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 0;
@@ -326,11 +340,9 @@
 			files = (
 				274CC7C91EF01143009FD9F0 /* AMapSearchObject+SearchObject.m in Sources */,
 				27471AC71EF0E7AC00525DA9 /* PlaceResultViewController.m in Sources */,
-				27E5BEAC1F022F66009A79D2 /* RouteCollectionViewCell.m in Sources */,
 				279021EC1EE6598800A4A7A1 /* ViewController.m in Sources */,
 				27E5BEA01F020925009A79D2 /* MANaviPolyline.m in Sources */,
 				274CC7C61EEFD617009FD9F0 /* MAMapView+MapView.m in Sources */,
-				27E5BEA91F022F0D009A79D2 /* SelectableOverlay.m in Sources */,
 				27F269111EF8FBA900F914E7 /* DetailsViewController.m in Sources */,
 				276016A61EE8103C00B69CE2 /* TLTextField.m in Sources */,
 				27E5BE9D1F020882009A79D2 /* MANaviRoute.m in Sources */,
@@ -467,8 +479,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: ZHENGFANG SOFTWARE CO.,LTD (C8BSBVK4XU)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ZHENGFANG SOFTWARE CO.,LTD (C8BSBVK4XU)";
-				DEVELOPMENT_TEAM = C8BSBVK4XU;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Pods/AMapLocation",
@@ -478,8 +490,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.zfsoft.tlgaodemap-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "90efec35-4948-4b92-82e6-3fcd9783ccaf";
-				PROVISIONING_PROFILE_SPECIFIER = XZGYXYDT_628;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -490,8 +502,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: ZHENGFANG SOFTWARE CO.,LTD (C8BSBVK4XU)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ZHENGFANG SOFTWARE CO.,LTD (C8BSBVK4XU)";
-				DEVELOPMENT_TEAM = C8BSBVK4XU;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Pods/AMapLocation",
@@ -501,8 +513,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.zfsoft.tlgaodemap-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "90efec35-4948-4b92-82e6-3fcd9783ccaf";
-				PROVISIONING_PROFILE_SPECIFIER = XZGYXYDT_628;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
